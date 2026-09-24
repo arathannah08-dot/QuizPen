@@ -1,54 +1,62 @@
-import { StyleSheet, Text, TouchableOpacity } from 'react-native';
-import {useState} from 'react';
+import { useRouter } from 'expo-router';
+import { useState } from 'react';
+import { Text } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import ActButton from '../../components/ui/ActButton';
-import UserInput from '../../components/ui/UserInput';
+import Add from '../../components/ui/Add';
 import AddSign from '../../components/ui/AddSign';
-import Add from '../../components/ui/Add';  
-import { useRouter } from 'expo-router'; 
-import {saveFlashcard} from '../../storage/flashcard';
+import UserInput from '../../components/ui/UserInput';
+import { saveFlashcard } from '../../storage/flashcard';
+
 
 export default function CreateFlash() {
   const router = useRouter();
+
 
   const [title, setTitle] = useState ('');
   const [desc, setDesc] = useState('');
   const [flash, setFlash] = useState(['']);
 
+
   const addFlash = () => {
     setFlash([...flash, '']);
   }
+
 
   return (
     <SafeAreaView>
         <Text>Create Flashcard</Text>
 
+
         <Text>Add Title</Text>
-        <UserInput 
+        <UserInput
          type="Title"
          value={title}
          onChangeText={setTitle}
         />
 
+
         <Text>Add Description</Text>
-        <UserInput 
+        <UserInput
          type="Description"
          value={desc}
          onChangeText={setDesc}
         />
 
-        <AddSign 
+
+        <AddSign
          icon="add-circle"
          size={30}
          color="darkblue"
          onPress={addFlash}
         />
-        
+       
         <Text>Add Flashcard</Text>
+
 
         {flash.map((item, index) => (
           <Add
-           key={index} 
+           key={index}
            add="Flashcard"
            value={item}
            onChangeText={(text) => {
@@ -59,7 +67,8 @@ export default function CreateFlash() {
           />
         ))}
 
-        <ActButton 
+
+        <ActButton
          name="Save Flashcard Set"
          onPress={async() => {
           await saveFlashcard({
@@ -68,9 +77,11 @@ export default function CreateFlash() {
             flash: flash
           });
 
+
           router.push('/(tabs)/flashcards');
          }}
         />
+
 
     </SafeAreaView>
   );
