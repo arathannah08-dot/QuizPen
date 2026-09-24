@@ -1,9 +1,11 @@
 import { StyleSheet, Text, TextInput, TouchableOpacity} from 'react-native';
 
-export default function Add ({add}) {
+export default function Add ({add, value, onChangeText}) {
     return (
         <TextInput 
          placeholder={add}
+         value={value}
+         onChangeText={onChangeText}
          style={styles.addBox}
         />
     );
