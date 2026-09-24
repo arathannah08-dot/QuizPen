@@ -1,42 +1,48 @@
-import { StyleSheet, Text, TouchableOpacity} from 'react-native';
+import { useRouter } from 'expo-router';
 import { useState } from 'react';
+import { Text, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useRouter } from 'expo-router'; 
-import UserInput from '../components/ui/UserInput'; 
-import ActButton from '../components/ui/ActButton'; 
-import {saveAccount} from '../storage/account';
+import ActButton from '../components/ui/ActButton';
+import UserInput from '../components/ui/UserInput';
+import { saveAccount } from '../storage/account';
+
 
 export default function RegisterScreen() {
     const router = useRouter();
+
 
     const [username, setUsername] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
 
+
     return (
         <SafeAreaView>
         <Text>Create Account</Text>
         <Text>Start your journey with Quizpen!</Text>
-        
-        <UserInput 
+       
+        <UserInput
          type="Username"
          value={username}
          onChangeText={setUsername}
         />
 
-        <UserInput 
+
+        <UserInput
          type="Email"
          value={email}
          onChangeText={setEmail}
         />
 
-        <UserInput 
+
+        <UserInput
          type="Password"
          value={password}
          onChangeText={setPassword}
         />
 
-        <ActButton 
+
+        <ActButton
          name="Sign Up"
          onPress={async () => {
             await saveAccount({
@@ -45,9 +51,11 @@ export default function RegisterScreen() {
                 password: password
             });
 
+
             router.push('/');
          }}
         />
+
 
         <Text>Already have an account?</Text>
         <TouchableOpacity onPress={() => router.push('/')}>
