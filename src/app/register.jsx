@@ -11,7 +11,6 @@ export default function RegisterScreen() {
         <Text>Create Account</Text>
         <Text>Start your journey with Quizpen!</Text>
         
-        <UserInput type="Full Name"/>
         <UserInput type="Username"/>
         <UserInput type="Email"/>
         <UserInput type="Password"/>
