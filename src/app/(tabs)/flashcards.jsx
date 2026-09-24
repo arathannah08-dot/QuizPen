@@ -26,7 +26,14 @@ export default function Flashcards() {
       <UserInput type="Search flashcard ..."/>
 
       {flashcards.map((item, index) => (
-        <TouchableOpacity key={index}>
+        <TouchableOpacity 
+          key={index}
+          onPress={() => router.push({
+            pathname: '/screens/flashscreen',
+            params: {index: index}
+          })}
+        >
+
           <Text>{item.title}</Text>
           <Text>{item.desc}</Text>
         </TouchableOpacity>
