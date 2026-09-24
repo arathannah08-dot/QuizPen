@@ -10,7 +10,6 @@ export default function CreateFlash() {
   const router = useRouter();
   return (
     <SafeAreaView>
-        <Text>QuizPen</Text>
         <Text>Create Flashcard</Text>
 
         <Text>Add Title</Text>

@@ -7,7 +7,7 @@ export default function Create() {
   const router = useRouter();
   return (
     <SafeAreaView>
-        <Text>QuizPen</Text>
+        <Text>Create</Text>
         <Text>What would you like to create?</Text>
 
         <ActButton 

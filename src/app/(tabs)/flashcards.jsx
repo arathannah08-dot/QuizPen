@@ -7,7 +7,6 @@ export default function Flashcards() {
   const router = useRouter();
   return (
     <SafeAreaView>
-      <Text>QuizPen</Text>
       <Text>Flashcards</Text>
       
       <UserInput type="Search flashcard ..."/>

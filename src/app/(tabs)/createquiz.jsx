@@ -10,7 +10,6 @@ export default function CreateQuiz() {
   const router = useRouter();
   return (
     <SafeAreaView>
-        <Text>QuizPen</Text>
         <Text>Create Quiz</Text>
 
         <Text>Add Title</Text>
