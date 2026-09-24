@@ -1,9 +1,11 @@
-import { StyleSheet, Text, TextInput} from 'react-native';
+import { StyleSheet, TextInput } from 'react-native';
 
-export default function UserInput ({type}) {
+export default function UserInput ({type, value, onChangeText}) {
     return (
         <TextInput 
         placeholder={type}
+        value={value}
+        onChangeText={onChangeText}
         style={styles.inputBox}
         />
     );
