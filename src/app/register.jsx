@@ -39,6 +39,7 @@ export default function RegisterScreen() {
          type="Password"
          value={password}
          onChangeText={setPassword}
+         isPassword
         />
 
 
