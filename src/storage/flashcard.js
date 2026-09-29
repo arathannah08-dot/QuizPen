@@ -1,20 +1,21 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-export const saveFlashcard = async (flashcard) => {
+export const updateFlashcard = async (index, updatedFlashcard) => {
     try {
         const data = await AsyncStorage.getItem('flashcards');
-
         const flashcards = data ? JSON.parse(data) : [];
 
-        flashcards.push(flashcard);
+        flashcards[index] = updatedFlashcard;
 
-        await AsyncStorage.setItem('flashcards', JSON.stringify(flashcards));
-    
+        await AsyncStorage.setItem(
+            'flashcards',
+            JSON.stringify(flashcards)
+        );
+
     } catch (error) {
-        console.log('Error saving flashcard:', error);
+        console.log('Error updating flashcard:', error);
     }
 };
-
 export const getFlashcard = async () => {
     try {
         const data = await AsyncStorage.getItem('flashcards');

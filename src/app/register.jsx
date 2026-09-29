@@ -1,10 +1,17 @@
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
-import { Text, TouchableOpacity } from 'react-native';
+import {
+    KeyboardAvoidingView,
+    Platform,
+    ScrollView,
+    Text,
+    TouchableOpacity
+} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import ActButton from '../components/ui/ActButton';
 import UserInput from '../components/ui/UserInput';
 import { saveAccount } from '../storage/account';
+
 
 
 export default function RegisterScreen() {
@@ -17,8 +24,16 @@ export default function RegisterScreen() {
 
 
     return (
-        <SafeAreaView>
-        <Text>Create Account</Text>
+        <SafeAreaView style={{ flex: 1}}>
+            <KeyboardAvoidingView
+                style={{ flex: 1}}
+                behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+            >
+                <ScrollView
+                    contentContainerStyle={{ flexGrow: 1}}
+                    keyboardShouldPersistTaps="handled"
+                >
+                            <Text>Create Account</Text>
         <Text>Start your journey with Quizpen!</Text>
        
         <UserInput
@@ -39,29 +54,39 @@ export default function RegisterScreen() {
          type="Password"
          value={password}
          onChangeText={setPassword}
-         isPassword
+         isPassword={true}
         />
 
 
         <ActButton
          name="Sign Up"
          onPress={async () => {
-            await saveAccount({
-                username: username,
-                email: email,
-                password: password
-            });
+            if (
+                username.trim() === '' ||
+                email.trim() === '' ||
+                password.trim() === ''
+            ) {
+                alert('Please fill in all fields.');
+                return;
+            }
 
+            await saveAccount({
+                username: username.trim(),
+                email: email.trim(),
+                password: password.trim()
+            });
 
             router.push('/');
          }}
         />
 
 
-        <Text>Already have an account?</Text>
-        <TouchableOpacity onPress={() => router.push('/')}>
-            <Text>Log In</Text>
-        </TouchableOpacity>
+            <Text>Already have an account?</Text>
+            <TouchableOpacity onPress={() => router.push('/')}>
+                <Text>Log In</Text>
+            </TouchableOpacity>
+                </ScrollView>
+            </KeyboardAvoidingView>
         </SafeAreaView>
     );
 }

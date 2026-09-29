@@ -7,7 +7,7 @@ export default function UserInput ({type, value, onChangeText, isPassword = fals
     const [showPassword, setShowPassword] = useState(false);
     
     return (
-        <View>
+        <View style={styles.inputContainer}>
             <TextInput 
             placeholder={type}
             value={value}
@@ -35,11 +35,12 @@ const styles = StyleSheet.create ({
     },
 
     inputBox: {
-        padding: 8,
-        borderRadius: 5,
-        borderWidth: 1,
-        borderColor: 'lightgrey'
-    },
+    padding: 8,
+    paddingRight: 40,
+    borderRadius: 5,
+    borderWidth: 1,
+    borderColor: 'lightgrey',
+},
 
     eyeIcon: {
         position: 'absolute',

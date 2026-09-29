@@ -1,6 +1,6 @@
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
-import { Alert, Text, TouchableOpacity } from 'react-native';
+import { Alert, KeyboardAvoidingView, Platform, ScrollView, Text, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import ActButton from '../components/ui/ActButton';
 import UserInput from '../components/ui/UserInput';
@@ -16,8 +16,18 @@ export default function HomeScreen() {
 
 
   return (
-    <SafeAreaView>
-      <Text>QuizPen</Text>
+    <SafeAreaView style={{ flex: 1 }}>
+      <KeyboardAvoidingView
+        style={{ flex: 1 }}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      >
+
+        <ScrollView
+          contentContainerStyle={{ flexGrow: 1}}
+          keyboardShouldPersistTaps="handled"
+        >
+
+                <Text>QuizPen</Text>
       <Text>Log in to get back to your learning journey!</Text>
      
       <UserInput
@@ -41,25 +51,42 @@ export default function HomeScreen() {
 
 
       <ActButton
-       name="Login"
-       onPress={async() => {
-        const account = await getAccount();
+  name="Login"
+  onPress={async () => {
+    const trimmedEmail = email.trim();
 
+    if (trimmedEmail === '' || password === '') {
+      Alert.alert('Please fill in all fields.');
+      return;
+    }
 
-        if (account && account.email === email && account.password === password) {
-          router.push('/home')
-        } else {
-          Alert.alert('Invalid email or password');
-        }
-       }}
-      />
+    const account = await getAccount();
+
+    console.log('Saved account:', account);
+    console.log('Login email:', trimmedEmail);
+    console.log('Login password:', password);
+
+    if (
+      account &&
+      account.email === trimmedEmail &&
+      account.password === password
+    ) {
+      router.push('/home');
+    } else {
+      Alert.alert('Invalid email or password');
+    }
+  }}
+/>
 
 
       <Text>Don't have an account yet?</Text>
       <ActButton
-       name="Sign Up" variant="outline"
-       onPress={() => router.push('/register')}
+        name="Sign Up" variant="outline"
+        onPress={() => router.push('/register')}
        />
+
+        </ScrollView>
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 }

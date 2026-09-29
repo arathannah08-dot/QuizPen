@@ -1,8 +1,8 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
-import { Modal, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 import { useState } from 'react';
+import { Modal, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
-export default function Display ({title, index,desc, length, name, onPress, onDelete}) {
+export default function Display ({title, index,desc, length, name, onPress, onDelete, onEdit}) {
 
     const [showDetails, setShowDetails] = useState(false);
 
@@ -25,7 +25,7 @@ export default function Display ({title, index,desc, length, name, onPress, onDe
             </Text>
 
             <View style={styles.options}>
-                <TouchableOpacity>
+                <TouchableOpacity onPress={onEdit}>
                     <Ionicons 
                      size={20}name ='create-outline'/>
                 </TouchableOpacity>

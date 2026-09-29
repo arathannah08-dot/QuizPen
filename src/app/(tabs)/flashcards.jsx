@@ -1,10 +1,9 @@
-import { StyleSheet, Text, View, ScrollView} from 'react-native';
-import {useEffect, useState, useCallback} from 'react';
-import { useRouter } from 'expo-router'; 
-import {getFlashcard} from "../../storage/flashcard";
-import Display from '../../components/ui/Display'; 
+import { useRouter } from 'expo-router';
+import { useCallback, useEffect, useState } from 'react';
+import { Alert, ScrollView, StyleSheet, Text, View } from 'react-native';
+import Display from '../../components/ui/Display';
 import SearchInput from '../../components/ui/SearchInput';
-import {deleteFlashcard} from "../../storage/flashcard";
+import { deleteFlashcard, getFlashcard } from "../../storage/flashcard";
 
 export default function Flashcards() {
   const router = useRouter();
@@ -34,18 +33,43 @@ export default function Flashcards() {
           key={index}
           title={item.title}
           desc={item.desc}
-          length={item.flash.length}
+          length={item.flash ? item.flash.length : 0}
           name='Cards'
+
           onPress={() => router.push({
             pathname: '/screens/flashscreen/[id]',
             params: {id: index}
-          })}
+          })
+        }
+
+        onEdit={() =>
+          router.push({
+            pathname: '/screens/editflash',
+            params: { id: index }
+          })
+        }
 
           onDelete={async () => {
-            await deleteFlashcard(index);
+            Alert.alert(
+              'Delete Flashcard',
+              'Are you sure you want to delete this flashcard?',
+              [
+                {
+                  text: 'cancel',
+                  style: 'cancel',
+                },
+                {
+                  text: 'Delete',
+                  style: 'destructive',
+                  onPress: async () => {
+                    await deleteFlashcard(index);
 
-            const data = await getFlashcard();
-            setFlashcards(data || []);
+                    const data = await getFlashcard();
+                    setFlashcards(data || []);
+                  },
+                },
+              ]
+            );
           }}
         />
       ))}
