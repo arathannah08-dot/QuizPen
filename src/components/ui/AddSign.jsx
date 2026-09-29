@@ -1,9 +1,9 @@
 import { StyleSheet, TouchableOpacity} from 'react-native';
 import Ionicons from '@expo/vector-icons/Ionicons';
 
-export default function AddSign ({icon, size = 30, color = "darkblue", onPress}) {
+export default function AddSign ({icon, size = 30, color = "darkblue", onPress, style}) {
     return (
-        <TouchableOpacity onPress={onPress}>
+        <TouchableOpacity onPress={onPress} style={style}>
             <Ionicons 
              name={icon}
              size={size} 
