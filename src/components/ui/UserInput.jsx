@@ -16,6 +16,6 @@ const styles = StyleSheet.create ({
         padding: 8,
         borderRadius: 5,
         borderWidth: 1,
-        borderColor: 'darkgrey'
+        borderColor: 'lightgrey'
     }
 });

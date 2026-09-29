@@ -77,11 +77,18 @@ export default function CreateFlash() {
             flash: flash
           });
 
+          setTitle('');
+          setDesc('');
+          setFlash(['']);
 
           router.push('/(tabs)/flashcards');
          }}
         />
 
+        <ActButton 
+         name="Go Back"
+         onPress={() => router.push('/(tabs)/flashcards')}
+        />
 
     </SafeAreaView>
   );

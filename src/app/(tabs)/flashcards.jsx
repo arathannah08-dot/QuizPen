@@ -1,44 +1,68 @@
-import { StyleSheet, Text, View, TouchableOpacity } from 'react-native';
-import {useEffect, useState} from 'react';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import UserInput from '../../components/ui/UserInput'; 
+import { StyleSheet, Text, View, ScrollView} from 'react-native';
+import {useEffect, useState, useCallback} from 'react';
 import { useRouter } from 'expo-router'; 
 import {getFlashcard} from "../../storage/flashcard";
+import Display from '../../components/ui/Display'; 
+import SearchInput from '../../components/ui/SearchInput';
+import {deleteFlashcard} from "../../storage/flashcard";
 
 export default function Flashcards() {
   const router = useRouter();
 
   const [flashcards, setFlashcards] = useState([]);
 
-  useEffect (() => {
+  useEffect (
+    useCallback(() => {
     const loadFlashcards = async () => {
       const data = await getFlashcard();
       setFlashcards(data);
     };
 
     loadFlashcards();
-  }, []);
+  }, []));
 
   return (
-    <SafeAreaView>
-      <Text>Flashcards</Text>
+    <ScrollView style={styles.container}>
+      <Text style={styles.header}>Flashcards</Text>
       
-      <UserInput type="Search flashcard ..."/>
+      <View>
+        <SearchInput type="Search flashcard ..."/>
+      </View>
 
       {flashcards.map((item, index) => (
-        <TouchableOpacity 
+        <Display
           key={index}
+          title={item.title}
+          desc={item.desc}
+          length={item.flash.length}
+          name='Cards'
           onPress={() => router.push({
-            pathname: '/screens/flashscreen',
-            params: {index: index}
+            pathname: '/screens/flashscreen/[id]',
+            params: {id: index}
           })}
-        >
 
-          <Text>{item.title}</Text>
-          <Text>{item.desc}</Text>
-        </TouchableOpacity>
+          onDelete={async () => {
+            await deleteFlashcard(index);
+
+            const data = await getFlashcard();
+            setFlashcards(data || []);
+          }}
+        />
       ))}
-
-    </SafeAreaView>
+    </ScrollView>
   );
 }
+
+const styles = StyleSheet.create ({
+  container: {
+    marginRight: 15,
+    marginLeft: 15,
+  },
+
+  header: {
+    fontSize: 35,
+    fontWeight: 'bold',
+    marginTop: 25,
+    marginBottom: 15
+  }
+})

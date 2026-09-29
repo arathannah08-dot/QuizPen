@@ -62,7 +62,7 @@ export default function CreateQuiz() {
              value={item.question}
              onChangeText={(text) => {
               const updatedQuiz = [...quiz];
-              updatedQuiz[index] = text;
+              updatedQuiz[index].question = text;
               setQuiz(updatedQuiz);
              }}
             />
@@ -73,7 +73,7 @@ export default function CreateQuiz() {
              value={item.answer}
              onChangeText={(text) => {
               const updatedQuiz = [...quiz];
-              updatedQuiz[index] = text;
+              updatedQuiz[index].answer = text;
               setQuiz(updatedQuiz);
              }}
             />
@@ -90,8 +90,22 @@ export default function CreateQuiz() {
             quiz: quiz
           });
 
+          setTitle('');
+          setDesc('');
+          setQuiz([
+            {
+              question: '',
+              answer: ''
+            }
+          ]);
+
           router.push('/(tabs)/quizzes');
          }}
+        />
+
+        <ActButton 
+         name="Go Back"
+         onPress={() => router.push('/(tabs)/quizzes')}
         />
 
       </ScrollView>

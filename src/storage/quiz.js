@@ -30,3 +30,16 @@ export const getQuiz = async () => {
         return null;
     }
 };
+
+export const deleteQuiz = async (index) => {
+    try {
+        const data = await AsyncStorage.getItem('quizzes');
+        const quizzes = data ? JSON.parse(data) : [];
+
+        quizzes.splice(index, 1);
+
+        await AsyncStorage.setItem('quizzes', JSON.stringify(quizzes));
+    } catch (error) {
+        console.log('Error deleting quiz:', error);
+    }
+};

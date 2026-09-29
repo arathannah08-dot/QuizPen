@@ -1,38 +1,66 @@
-import { StyleSheet, Text, TouchableOpacity, View} from 'react-native';
-import { use, useEffect, useState } from 'react';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import UserInput from '../../components/ui/UserInput'; 
+import { StyleSheet, Text, View, ScrollView} from 'react-native';
+import { useEffect, useCallback, useState } from 'react';
+import SearchInput from '../../components/ui/SearchInput'; 
 import { useRouter } from 'expo-router'; 
 import { getQuiz } from '../../storage/quiz';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import Display from '../../components/ui/Display';
+import { deleteQuiz } from '../../storage/quiz';
 
 export default function Quizzes() {
   const router = useRouter();
 
   const [quizzes, setQuizzes] = useState ([]);
 
-  useEffect (() => {
+  useEffect (
+    useCallback (() => {
     const loadQuizzes = async () => {
       const data = await getQuiz();
       setQuizzes(data);
     };
 
     loadQuizzes();
-  }, []);
+  }, []));
 
   return (
-    <SafeAreaView>
-      <Text>Flashcards</Text>
+    <ScrollView style={styles.container}>
+      <Text style={styles.header}>Quizzes</Text>
       
-      <UserInput type="Search quiz ..."/>
+      <SearchInput type="Search quiz ..."/>
 
       {quizzes.map((item, index) => (
-        <TouchableOpacity key={index}>
-          <Text>{item.title}</Text>
-          <Text>{item.desc}</Text>
-        </TouchableOpacity>
-      ))}
+        <Display
+         key={index}
+         title={item.title}
+         desc={item.desc}
+         length={item.quiz.length}
+         name='Items'
+         onPress={() => router.push({
+          pathname: '/screens/quizscreen/[id]',
+          params: {id: index}
+         })}
 
-    </SafeAreaView>
+         onDelete={ async() => {
+          await deleteQuiz(index);
+        
+          const data = await getQuiz();
+          setQuizzes(data || []);
+        }}
+        />
+      ))}
+    </ScrollView>
   );
 }
+
+const styles = StyleSheet.create ({
+  container: {
+    marginRight: 15,
+    marginLeft: 15
+  },
+
+  header: {
+    fontSize: 35,
+    fontWeight: 'bold',
+    marginTop: 25,
+    marginBottom: 15
+  }
+})

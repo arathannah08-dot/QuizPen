@@ -12,11 +12,11 @@ export default function Create() {
 
         <ActButton 
          name="Flashcard"
-         onPress={() => router.push('/(tabs)/createflash')}
+         onPress={() => router.push('/screens/createflash')}
         />
         <ActButton 
          name="Quiz"
-         onPress={() => router.push('/(tabs)/createquiz')}
+         onPress={() => router.push('/screens/createquiz')}
         />
     </SafeAreaView>
   );

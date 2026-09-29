@@ -77,20 +77,6 @@ export default function TabLayout() {
                 ),
              }}
             />
-
-            <Tabs.Screen
-             name="createflash"
-             options={{
-                href: null,
-             }}
-            />
-
-            <Tabs.Screen
-             name="createquiz"
-             options={{
-                href: null,
-             }}
-            />
         </Tabs>
     );
 }
