@@ -1,0 +1,12 @@
+* [33mae503ee[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m create flashcards.js to store flashcards
+*   [33mf783c9a[m Merge branch 'main' of https://github.com/arathannah08-dot/QuizPen
+[32m|[m[33m\[m  
+[32m|[m * [33m2472e17[m Updated quizzes.jsx
+[32m|[m * [33m70508a1[m Updated createquiz.jsx
+[32m|[m * [33m7b61c82[m Created quiz.js (to store creates quiz)
+* [33m|[m [33mc77a5c4[m Updated register.jsx and index.jsx to use AsyncStorage and useState.
+[33m|[m[33m/[m  
+* [33m80f54cb[m cleaned up account.js
+* [33m047b699[m Used map for displaying flashcards array
+* [33mfef2964[m Update app features (changed adding of flashcard logic)
+* [33m4d4ed90[m Update flashcard.js logic

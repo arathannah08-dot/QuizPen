@@ -31,6 +31,7 @@ export default function HomeScreen() {
        type="Password"
        value={password}
        onChangeText={setPassword}
+       isPassword
       />
 
 
