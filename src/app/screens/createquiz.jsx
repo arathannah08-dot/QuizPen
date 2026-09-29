@@ -1,4 +1,4 @@
-import { ScrollView, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
+import { ScrollView, StyleSheet, View, Text} from 'react-native';
 import { useState} from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import ActButton from '../../components/ui/ActButton';
@@ -31,22 +31,39 @@ export default function CreateQuiz() {
 
   return (
     <SafeAreaView>
-      <ScrollView>
-        <Text>Create Quiz</Text>
+      <ScrollView style={styles.container}>
+        <View style={styles.header}>
 
-        <Text>Add Title</Text>
+          <AddSign
+          icon="arrow-back-outline"
+          size={30}
+          color="black"
+          onPress={() => router.push('/(tabs)/create')}
+          />
+          <Text style={styles.headerTxt}>
+            Create Quiz
+          </Text>
+
+        </View>
+
+        <Text style={styles.subTxt}>
+          Add Title
+        </Text>
         <UserInput 
          type="Title"
          value={title}
          onChangeText={setTitle}/>
 
-        <Text>Add Description</Text>
+        <Text style={styles.subTxt}>
+          Add Description
+        </Text>
         <UserInput 
          type="Description"
          value={desc}
          onChangeText={setDesc}/>
 
         <AddSign 
+         style={styles.addSign}
          icon="add-circle"
          size={30}
          color="darkblue"
@@ -54,9 +71,13 @@ export default function CreateQuiz() {
         />
         
         {quiz.map((item, index) => (
-          <View key={index}>
+          <View
+           style={styles.cards} 
+           key={index}>
             
-            <Text>Add Question</Text>
+            <Text style={styles.subTxt}>
+              Add Question
+            </Text>
             <Add 
              add="Question"
              value={item.question}
@@ -67,7 +88,9 @@ export default function CreateQuiz() {
              }}
             />
 
-            <Text>Add Answer</Text>
+            <Text style={styles.subTxt}>
+              Add Answer
+            </Text>
             <Add 
              add="Answer"
              value={item.answer}
@@ -103,12 +126,42 @@ export default function CreateQuiz() {
          }}
         />
 
-        <ActButton 
-         name="Go Back"
-         onPress={() => router.push('/(tabs)/quizzes')}
-        />
-
       </ScrollView>
     </SafeAreaView>
   );
 }
+
+const styles= StyleSheet.create ({
+  container: {
+    marginRight: 15,
+    marginLeft: 15,
+  },
+
+  header: {
+    flexDirection: 'row',
+    alignItems: 'baseline',
+    marginBottom: 12,
+    gap: 5
+  },
+
+  headerTxt: {
+    fontSize: 30,
+    fontWeight: 'bold',
+  },
+
+  subTxt: {
+    fontSize: 15,
+    fontWeight: 'bold',
+    marginTop: 10,
+    marginBottom: 5
+  },
+
+  addSign: {
+    alignSelf: 'flex-end',
+    marginTop: 15
+  },
+
+  cards: {
+    marginBottom: 20
+  }
+})

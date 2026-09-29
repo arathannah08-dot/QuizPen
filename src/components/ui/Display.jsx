@@ -1,7 +1,11 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
-import { StyleSheet, Text, TouchableOpacity, View} from 'react-native';
+import { Modal, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
+import { useState } from 'react';
 
-export default function Display ({title, desc, length, name, onPress, onDelete}) {
+export default function Display ({title, index,desc, length, name, onPress, onDelete}) {
+
+    const [showDetails, setShowDetails] = useState(false);
+
     return (
         <TouchableOpacity
             style={styles.box}
@@ -11,7 +15,7 @@ export default function Display ({title, desc, length, name, onPress, onDelete})
                 <Text style={styles.title}>
                     {title}
                 </Text>
-                <TouchableOpacity>
+                <TouchableOpacity onPress={() => setShowDetails(true)}>
                     <Ionicons size={20} name='alert-circle-outline'/>
                 </TouchableOpacity>
             </View>
@@ -31,7 +35,35 @@ export default function Display ({title, desc, length, name, onPress, onDelete})
                      name ='trash-outline'/>
                 </TouchableOpacity>
             </View>
+            <Modal
+             visible={showDetails}
+             transparent={true}
+             animationType="fade"
+            >
 
+                <View style={styles.modalBackground}>
+                    <View style={styles.modalBox}>
+
+                        <Text style={styles.modalTitle}>
+                            {title}
+                        </Text>
+                        <Text style={styles.modalDesc}>
+                            {desc}
+                        </Text>
+                        <Text style={styles.modalLength}>
+                            {length} {name}
+                        </Text>
+
+                        <TouchableOpacity 
+                         style={styles.closeBttn}
+                         onPress={() => setShowDetails(false)}>
+                            <Text style={styles.closeTxt}>
+                                Close
+                            </Text>
+                        </TouchableOpacity>
+                    </View>
+                </View>
+            </Modal>
         </TouchableOpacity>
     );
 }
@@ -62,5 +94,45 @@ const styles = StyleSheet. create ({
     flexDirection: 'row',
     alignItems: 'baseline',
     gap: 5
+  },
+
+  modalBackground: {
+    flex: 1,
+    backgroundColor: 'lightgrey',
+    justifyContent: 'center',
+    alignItems: 'center'
+  },
+
+  modalBox: {
+    width: '88%',
+    padding: 20,
+    borderRadius: 15,
+    backgroundColor: 'white'
+  },
+
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginBottom: 10
+  },
+
+  modalDesc: {
+    fontSize: 16,
+    marginBottom: 10
+  },
+
+  modalLength: {
+    fontSize: 14,
+    color: 'grey',
+    marginBottom: 20
+  },
+
+  closeBttn: {
+    alignSelf: 'flex-end'
+  },
+
+  closeTxt: {
+    fontSize: 16,
+    fontWeight: 'bold'
   }
 })
