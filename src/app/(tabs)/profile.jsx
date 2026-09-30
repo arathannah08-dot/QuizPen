@@ -43,14 +43,14 @@ export default function Profile() {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#F3EEFB',
+        backgroundColor: '#3e0945',
         paddingHorizontal: 20,
     },
 
     header: {
         fontSize: 32,
         fontWeight: '800',
-        color: '#292333',
+        color: '#e9e4f1',
         marginTop: 25,
         marginBottom: 20,
     },
@@ -58,17 +58,17 @@ const styles = StyleSheet.create({
     statsBox: {
         flexDirection: 'row',
         justifyContent: 'space-around',
-        backgroundColor: '#FFFFFF',
+        backgroundColor: '#6b1376',
         borderRadius: 16,
         paddingVertical: 25,
         borderWidth: 1,
-        borderColor: '#DDD6EA',
+        borderColor: '#9c94ae',
     },
 
     stat: {
         fontSize: 16,
         fontWeight: '700',
-        color: '#6C4AB6',
+        color: '#ccc8d5',
     },
 
     options: {

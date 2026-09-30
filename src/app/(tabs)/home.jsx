@@ -110,7 +110,7 @@ const styles = StyleSheet.create({
 
     container: {
         flex: 1,
-        backgroundColor: '#F8F6FC',
+        backgroundColor: '#3e0945',
     },
 
     content: {
@@ -121,13 +121,13 @@ const styles = StyleSheet.create({
     logo: {
         fontSize: 32,
         fontWeight: '800',
-        color: '#6C4AB6',
+        color: '#a997ce',
         marginTop: 20,
     },
 
     welcome: {
         fontSize: 18,
-        color: '#817B8D',
+        color: '#e9e4f1',
         marginTop: 4,
         marginBottom: 10,
     },
@@ -135,7 +135,7 @@ const styles = StyleSheet.create({
     sectionTitle: {
         fontSize: 20,
         fontWeight: '700',
-        color: '#292333',
+        color: '#e9e4f1',
         marginTop: 25,
         marginBottom: 10,
     },

@@ -1,5 +1,21 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
+export const saveFlashcard = async (newFlashcard) => {
+    try {
+        const data = await AsyncStorage.getItem('flashcards');
+        const flashcards = data ? JSON.parse(data) : [];
+
+        flashcards.push(newFlashcard);
+
+        await AsyncStorage.setItem(
+            'flashcards',
+            JSON.stringify(flashcards)
+        );
+    } catch (error) {
+        console.log('Error saving flashcard:', error);
+    }
+};
+
 export const updateFlashcard = async (index, updatedFlashcard) => {
     try {
         const data = await AsyncStorage.getItem('flashcards');
@@ -11,11 +27,11 @@ export const updateFlashcard = async (index, updatedFlashcard) => {
             'flashcards',
             JSON.stringify(flashcards)
         );
-
     } catch (error) {
         console.log('Error updating flashcard:', error);
     }
 };
+
 export const getFlashcard = async () => {
     try {
         const data = await AsyncStorage.getItem('flashcards');
@@ -25,7 +41,6 @@ export const getFlashcard = async () => {
         }
 
         return null;
-        
     } catch (error) {
         console.log('Error getting flashcard:', error);
         return null;
@@ -39,8 +54,11 @@ export const deleteFlashcard = async (index) => {
 
         flashcards.splice(index, 1);
 
-        await AsyncStorage.setItem('flashcards', JSON.stringify(flashcards));
+        await AsyncStorage.setItem(
+            'flashcards',
+            JSON.stringify(flashcards)
+        );
     } catch (error) {
-        console.log('Error deleting flashcard:', error)
+        console.log('Error deleting flashcard:', error);
     }
-}
+};

@@ -103,7 +103,7 @@ const styles = StyleSheet.create({
 
     container: {
         flex: 1,
-        backgroundColor: '#F3EEFB',
+        backgroundColor: '#3e0945',
     },
 
     content: {
@@ -114,7 +114,7 @@ const styles = StyleSheet.create({
     header: {
         fontSize: 35,
         fontWeight: 'bold',
-        color: '#292333',
+        color: '#e9e4f1',
         marginTop: 25,
         marginBottom: 15,
     },

@@ -24,24 +24,18 @@ export default function AddSign({
 }
 
 const styles = StyleSheet.create({
-
     addButton: {
         width: 48,
         height: 48,
         borderRadius: 24,
-        backgroundColor: '#6C4AB6',
-
+        backgroundColor: '#4d1147',
         alignItems: 'center',
         justifyContent: 'center',
 
-        shadowColor: '#6C4AB6',
-        shadowOffset: {
-            width: 0,
-            height: 3,
-        },
-        shadowOpacity: 0.2,
+        shadowColor: 'black',
+        shadowOffset: { width: 0, height: 0 },
+        shadowOpacity: 0.3,
         shadowRadius: 5,
-        elevation: 3,
+        elevation: 5,
     },
-
 });

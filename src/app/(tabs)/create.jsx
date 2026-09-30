@@ -18,7 +18,7 @@ export default function Create() {
 
             <ActButton
                 name="Flashcard"
-                onPress={() => router.push('/screens/createflash')}
+                onPress={() => router.push('/screens//createflash')}
             />
 
             <ActButton
@@ -32,21 +32,21 @@ export default function Create() {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#EEE8FA',
+        backgroundColor: '#3e0945',
         paddingHorizontal: 20,
     },
 
     header: {
         fontSize: 32,
         fontWeight: '800',
-        color: '#292333',
+        color: '#e9e4f1',
         marginTop: 25,
         marginBottom: 8,
     },
 
     subtitle: {
         fontSize: 16,
-        color: '#817B8D',
+        color: '#9c94ae',
         marginBottom: 15,
     },
 });
