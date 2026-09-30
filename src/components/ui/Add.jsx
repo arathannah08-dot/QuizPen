@@ -1,12 +1,14 @@
 import { StyleSheet, TextInput } from 'react-native';
 
-export default function Add ({add, value, onChangeText}) {
+export default function Add({ add, value, onChangeText }) {
     return (
         <TextInput
-         placeholder={add}
-         value={value}
-         onChangeText={onChangeText}
-         style={styles.addBox}
+            placeholder={add}
+            placeholderTextColor="#9B94A8"
+            value={value}
+            onChangeText={onChangeText}
+            style={styles.addBox}
+            multiline={true}
         />
     );
 }
@@ -14,21 +16,15 @@ export default function Add ({add, value, onChangeText}) {
 
 const styles = StyleSheet.create({
     addBox: {
+        width: '100%',
         padding: 15,
         minHeight: 120,
+
         borderRadius: 12,
         borderWidth: 1,
-<<<<<<< Updated upstream
+
         borderColor: 'lightgrey'
     }
 });
-=======
-        borderColor: '#DDD6EA',
-        backgroundColor: '#FFFFFF',
-        color: '#292333',
-        fontSize: 15,
-        textAlignVertical: 'top',
-        marginTop: 10,
-    },
-});
->>>>>>> Stashed changes
+
+
