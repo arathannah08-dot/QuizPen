@@ -1,14 +1,11 @@
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import {
-    KeyboardAvoidingView,
-    Platform,
-    ScrollView,
     Text,
     TouchableOpacity
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import ActButton from '../components/ui/ActButton';
+import AuthForm from '../components/ui/AuthForm';
 import UserInput from '../components/ui/UserInput';
 import { saveAccount } from '../storage/account';
 
@@ -17,31 +14,20 @@ import { saveAccount } from '../storage/account';
 export default function RegisterScreen() {
     const router = useRouter();
 
-
     const [username, setUsername] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
 
-
     return (
-        <SafeAreaView style={{ flex: 1}}>
-            <KeyboardAvoidingView
-                style={{ flex: 1}}
-                behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-            >
-                <ScrollView
-                    contentContainerStyle={{ flexGrow: 1}}
-                    keyboardShouldPersistTaps="handled"
-                >
-                            <Text>Create Account</Text>
-        <Text>Start your journey with Quizpen!</Text>
-       
+        <AuthForm
+        title= "Create Account"
+        subtitle= "Start your journey with Quizpen!"
+       >
         <UserInput
          type="Username"
          value={username}
          onChangeText={setUsername}
         />
-
 
         <UserInput
          type="Email"
@@ -49,14 +35,12 @@ export default function RegisterScreen() {
          onChangeText={setEmail}
         />
 
-
         <UserInput
          type="Password"
          value={password}
          onChangeText={setPassword}
          isPassword={true}
         />
-
 
         <ActButton
          name="Sign Up"
@@ -80,13 +64,10 @@ export default function RegisterScreen() {
          }}
         />
 
-
             <Text>Already have an account?</Text>
             <TouchableOpacity onPress={() => router.push('/')}>
                 <Text>Log In</Text>
             </TouchableOpacity>
-                </ScrollView>
-            </KeyboardAvoidingView>
-        </SafeAreaView>
+      </AuthForm>
     );
 }
