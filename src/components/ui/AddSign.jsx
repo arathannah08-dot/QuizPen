@@ -1,9 +1,18 @@
-import { StyleSheet, TouchableOpacity} from 'react-native';
 import Ionicons from '@expo/vector-icons/Ionicons';
+import { StyleSheet, TouchableOpacity } from 'react-native';
 
+<<<<<<< Updated upstream
 export default function AddSign ({icon, size = 30, color = "darkblue", onPress, style}) {
     return (
         <TouchableOpacity onPress={onPress} style={style}>
+=======
+export default function AddSign ({icon, size = 30, color = "#FFFFFF", onPress}) {
+    return (
+        <TouchableOpacity 
+            onPress={onPress}
+            style={styles.addButton}
+        >
+>>>>>>> Stashed changes
             <Ionicons 
              name={icon}
              size={size} 
@@ -13,11 +22,22 @@ export default function AddSign ({icon, size = 30, color = "darkblue", onPress, 
     );
 }
 
-const styles = StyleSheet.create ({
-    addBox: {
-        padding: 55,
-        borderRadius: 5,
-        borderWidth: 1,
-        borderColor: 'darkgrey'
-    }
+const styles = StyleSheet.create({
+    addButton: {
+        width: 48,
+        height: 48,
+        borderRadius: 24,
+        backgroundColor: '#6C4AB6',
+        alignItems: 'center',
+        justifyContent: 'center',
+
+        shadowColor: '#6C4AB6',
+        shadowOffset: {
+            width: 0,
+            height: 3,
+        },
+        shadowOpacity: 0.2,
+        shadowRadius: 5,
+        elevation: 3,
+    },
 });

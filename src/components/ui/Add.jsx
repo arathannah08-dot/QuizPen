@@ -12,11 +12,23 @@ export default function Add ({add, value, onChangeText}) {
 }
 
 
-const styles = StyleSheet.create ({
+const styles = StyleSheet.create({
     addBox: {
-        padding: 55,
-        borderRadius: 5,
+        padding: 15,
+        minHeight: 120,
+        borderRadius: 12,
         borderWidth: 1,
+<<<<<<< Updated upstream
         borderColor: 'lightgrey'
     }
 });
+=======
+        borderColor: '#DDD6EA',
+        backgroundColor: '#FFFFFF',
+        color: '#292333',
+        fontSize: 15,
+        textAlignVertical: 'top',
+        marginTop: 10,
+    },
+});
+>>>>>>> Stashed changes

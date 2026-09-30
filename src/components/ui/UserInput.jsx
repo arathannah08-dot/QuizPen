@@ -7,6 +7,7 @@ export default function UserInput ({type, value, onChangeText, isPassword = fals
     const [showPassword, setShowPassword] = useState(false);
     
     return (
+<<<<<<< Updated upstream
         <View style={styles.inputContainer}>
             <TextInput 
             placeholder={type}
@@ -26,6 +27,15 @@ export default function UserInput ({type, value, onChangeText, isPassword = fals
                 </TouchableOpacity>          
             )}
         </View>
+=======
+        <TextInput 
+        placeholder={type}
+        placeholderTextColor="#9B94A8"
+        value={value}
+        onChangeText={onChangeText}
+        style={styles.inputBox}
+        />
+>>>>>>> Stashed changes
     );
 }
 
@@ -35,6 +45,7 @@ const styles = StyleSheet.create ({
     },
 
     inputBox: {
+<<<<<<< Updated upstream
     padding: 8,
     paddingRight: 40,
     borderRadius: 5,
@@ -50,4 +61,17 @@ const styles = StyleSheet.create ({
         justifyContent: 'center'
     }
 
+=======
+        width: '100%',
+        paddingVertical: 14,
+        paddingHorizontal: 16,
+        borderRadius: 12,
+        borderWidth: 1,
+        borderColor: '#DDD6EA',
+        backgroundColor: '#FFFFFF',
+        color: '#292333',
+        fontSize: 15,
+        marginTop: 12,
+    },
+>>>>>>> Stashed changes
 });

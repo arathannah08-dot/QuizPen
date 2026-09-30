@@ -22,25 +22,31 @@ export default function ActButton ({name, variant = "filled", onPress}) {
 
 const styles = StyleSheet.create ({
     filledBtn: {
-        padding: 10,
-        borderRadius: 8,
-        backgroundColor: 'darkblue'
+        width: '100%',
+        paddingVertical: 14,
+        borderRadius: 12,
+        backgroundColor: '#6C4AB6',
+        marginTop: 12,
+        alignItems: 'center',
     },
 
     buttonTxt: {
-        color: 'white',
-        fontWeight: 'bold',
-        textAlign: 'center'
+         color: '#FFFFFF',
+        fontSize: 16,
+        fontWeight: '700',
+        textAlign: 'center',
     },
 
     outlineBtn: {
-        backgroundColor: 'white',
-        borderWidth: 1,
-        borderColor: 'darkblue'
+        backgroundColor: '#FFFFFF',
+        borderWidth: 1.5,
+        borderColor: '#6C4AB6',
     },
 
     outlineTxt: {
-        color: 'darkblue',
-        textAlign: 'center'
+        color: '#6C4AB6',
+        fontSize: 16,
+        fontWeight: '700',
+        textAlign: 'center',
     }
 });

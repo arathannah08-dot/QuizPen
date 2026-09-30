@@ -1,5 +1,5 @@
-import { StyleSheet, TextInput, View} from 'react-native';
 import Ionicons from '@expo/vector-icons/Ionicons';
+import { StyleSheet, TextInput, View } from 'react-native';
 
 export default function SearchInput ({type, value, onChangeText}) {
     return (
@@ -8,11 +8,12 @@ export default function SearchInput ({type, value, onChangeText}) {
              style={styles.icon}
              name="search" 
              size={20} 
-             color='darkgrey' 
+             color="#6C4AB6" 
             />
 
             <TextInput 
             placeholder={type}
+            placeholderTextColor="#9B94A8"
             value={value}
             onChangeText={onChangeText}
             style={styles.input}
@@ -25,19 +26,23 @@ const styles = StyleSheet.create ({
     search: {
         flexDirection: 'row',
         alignItems: 'center',
-        borderRadius: 20,
+        borderRadius: 15,
         borderWidth: 1,
-        borderColor: 'lightgrey',
-        backgroundColor: 'white'
+        borderColor: '#DDD6EA',
+        backgroundColor: '#FFFFFF',
+        height: 48,
+        paddingHorizontal: 12,
+        marginBottom: 10,
     },
 
     icon: {
-        marginLeft: 5,
+        marginLeft: 8,
     },
 
     input: {
         flex: 1,
-        padding: 8,
-        fontSize: 16
-    }
+        fontSize: 15,
+        color: '#292333',
+        marginLeft: 8,
+    },
 });

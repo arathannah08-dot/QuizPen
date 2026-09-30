@@ -1,10 +1,14 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
+<<<<<<< Updated upstream
 import { useState } from 'react';
 import { Modal, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 export default function Display ({title, index,desc, length, name, onPress, onDelete, onEdit}) {
 
     const [showDetails, setShowDetails] = useState(false);
+=======
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+>>>>>>> Stashed changes
 
     return (
         <TouchableOpacity
@@ -20,19 +24,22 @@ export default function Display ({title, index,desc, length, name, onPress, onDe
                 </TouchableOpacity>
             </View>
 
-            <Text style={{color: 'lightgrey'}}>
+            <Text style={styles.cardInfo}>
                 {length} {name}
             </Text>
 
             <View style={styles.options}>
                 <TouchableOpacity onPress={onEdit}>
                     <Ionicons 
-                     size={20}name ='create-outline'/>
+                     size={20}
+                     name="create-outline"
+                     color="#6C4AB6"/>
                 </TouchableOpacity>
                 <TouchableOpacity onPress={onDelete}>
                     <Ionicons 
                      size={20}
-                     name ='trash-outline'/>
+                     name="trash-outline"
+                     color="#6C4AB6"/>
                 </TouchableOpacity>
             </View>
             <Modal
@@ -70,28 +77,40 @@ export default function Display ({title, index,desc, length, name, onPress, onDe
 
 const styles = StyleSheet. create ({
   box: {
-    padding: 10,
-    marginTop: 12,
-    borderColor: 'lightgrey',
-    borderRadius: 15,
-    borderWidth: 1,
-    backgroundColor: 'white'
+     padding: 16,
+        marginTop: 12,
+        borderColor: '#E1D9EF',
+        borderRadius: 16,
+        borderWidth: 1,
+        backgroundColor: '#FFFFFF',
+
+         shadowColor: '#6C4AB6',
+        shadowOffset: {
+            width: 0,
+            height: 3,
+        },
+        shadowOpacity: 0.08,
+        shadowRadius: 6,
+        elevation: 2,
   },
 
   title: {
     fontSize: 18,
-    fontWeight: 'bold',
-    marginBottom: 5
+        fontWeight: '700',
+        color: '#292333',
+        marginBottom: 5,
   },
 
   options: {
-    marginRight: 3,
-    flexDirection: 'row',
-    justifyContent: 'flex-end'
+    marginTop: 12,
+        flexDirection: 'row',
+        justifyContent: 'flex-end',
+        gap: 15,
   },
 
   detail: {
     flexDirection: 'row',
+<<<<<<< Updated upstream
     alignItems: 'baseline',
     gap: 5
   },
@@ -135,4 +154,15 @@ const styles = StyleSheet. create ({
     fontSize: 16,
     fontWeight: 'bold'
   }
+=======
+        alignItems: 'center',
+        justifyContent: 'space-between',
+  },
+
+  cardInfo: {
+    color: '#817B8D',
+    fontSize: 14,
+    marginTop: 2,
+},
+>>>>>>> Stashed changes
 })
