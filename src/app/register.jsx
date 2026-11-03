@@ -54,12 +54,18 @@ export default function RegisterScreen() {
                 return;
             }
 
-            await saveAccount({
+            const success = await saveAccount({
                 username: username.trim(),
                 email: email.trim(),
                 password: password.trim()
             });
 
+            if (!success) {
+                alert('This email is already registered.');
+                return;
+            }
+
+            alert('Account created successfully!');
             router.push('/');
          }}
         />

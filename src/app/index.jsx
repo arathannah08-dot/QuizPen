@@ -4,7 +4,7 @@ import { Alert, Text, TouchableOpacity } from 'react-native';
 import ActButton from '../components/ui/ActButton';
 import AuthForm from '../components/ui/AuthForm';
 import UserInput from '../components/ui/UserInput';
-import { getAccount } from '../storage/account';
+import { getAccountByEmail, setCurrentUser } from '../storage/account';
 
 export default function HomeScreen() {
   const router = useRouter();
@@ -50,7 +50,7 @@ export default function HomeScreen() {
       return;
     }
 
-    const account = await getAccount();
+    const account = await getAccountByEmail(trimmedEmail);
 
     console.log('Saved account:', account);
     console.log('Login email:', trimmedEmail);
@@ -61,6 +61,9 @@ export default function HomeScreen() {
       account.email === trimmedEmail &&
       account.password === password
     ) {
+
+      await setCurrentUser(account.id);
+
       router.push('/home');
     } else {
       Alert.alert('Invalid email or password');
