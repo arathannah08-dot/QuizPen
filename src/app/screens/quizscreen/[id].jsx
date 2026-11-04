@@ -3,47 +3,47 @@ import { useEffect, useState } from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import ActButton from '../../../components/ui/ActButton';
-import { getFlashcard } from '../../../storage/flashcard';
+import { getQuiz } from '../../../storage/quiz';
 
 export default function Flashscreen() {
   const router = useRouter();
   const { id } = useLocalSearchParams();
 
-  const [flashcard, setFlashcard] = useState(null);
+  const [quiz, setQuiz] = useState(null);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [showAnswer, setShowAnswer] = useState(false);
 
   useEffect(() => {
-    const loadFlashcards = async () => {
-      const data = await getFlashcard();
+    const loadQuizzes = async () => {
+      const data = await getQuiz();
 
       if (data) {
-        setFlashcard(data[Number(id)] || null);
+        setQuiz(data[Number(id)] || null);
       }
     };
 
-    loadFlashcards();
+    loadQuizzes();
   }, [id]);
 
-  if (!flashcard) {
+  if (!quiz) {
     return (
       <SafeAreaView style={styles.container}>
-        <Text>Loading flashcard...</Text>
+        <Text>Loading quiz...</Text>
       </SafeAreaView>
     );
   }
 
-  const cards = Array.isArray(flashcard.flash)
-    ? flashcard.flash
+  const cards = Array.isArray(quiz.quiz)
+    ? quiz.quiz
     : [];
 
   if (cards.length === 0) {
     return (
       <SafeAreaView style={styles.container}>
-        <Text>No flashcards available.</Text>
+        <Text>No quiz questions available.</Text>
         <ActButton
           name="Go Back"
-          onPress={() => router.push('/(tabs)/flashcards')}
+          onPress={() => router.push('/(tabs)/quizzes')}
         />
       </SafeAreaView>
     );
@@ -65,8 +65,8 @@ export default function Flashscreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <Text style={styles.title}>{flashcard.title}</Text>
-      <Text style={styles.description}>{flashcard.desc}</Text>
+      <Text style={styles.title}>{quiz.title}</Text>
+      <Text style={styles.description}>{quiz.question}</Text>
 
       <Text style={styles.counter}>
         Card {currentIndex + 1} of {cards.length}
@@ -110,7 +110,7 @@ export default function Flashscreen() {
 
       <ActButton
         name="Go Back"
-        onPress={() => router.push('/(tabs)/flashcards')}
+        onPress={() => router.push('/(tabs)/quizzes')}
       />
     </SafeAreaView>
   );

@@ -1,11 +1,11 @@
-import { ScrollView, StyleSheet, View, Text} from 'react-native';
-import { useState} from 'react';
+import { useRouter } from 'expo-router';
+import { useState } from 'react';
+import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import ActButton from '../../components/ui/ActButton';
-import UserInput from '../../components/ui/UserInput';
+import Add from '../../components/ui/Add';
 import AddSign from '../../components/ui/AddSign';
-import Add from '../../components/ui/Add';  
-import { useRouter } from 'expo-router';
+import UserInput from '../../components/ui/UserInput';
 import { saveQuiz } from '../../storage/quiz';
 
 export default function CreateQuiz() {
@@ -27,6 +27,49 @@ export default function CreateQuiz() {
         answer: '',
       }
     ]);
+  };
+
+  // Save the flashcard set
+  const handleSave = async () => {
+    if (!title.trim()) {
+      Alert.alert('Missing Title', 'Please enter a quiz title.');
+      return;
+    }
+
+    const hasEmptyCard = quiz.some(
+      item => !item.question.trim() || !item.answer.trim()
+    );
+
+    if (hasEmptyCard) {
+      Alert.alert(
+        'Incomplete Quiz',
+        'Please enter both the Question and Answer for every quiz question.'
+      );
+      return;
+    }
+
+    const result = await saveQuiz({
+      title: title.trim(),
+      desc: desc.trim(),
+      quiz: quiz.map(item => ({
+        question: item.question.trim(),
+        answer: item.answer.trim()
+      }))
+    });
+
+    if (result) {
+      Alert.alert('Success', 'Your quiz has been saved!', [
+        {
+          text: 'OK',
+          onPress: () => router.replace('/(tabs)/quizzes')
+        }
+      ]);
+    } else {
+      Alert.alert(
+        'Error',
+        'Unable to save your quiz. Please check if you are logged in.'
+      );
+    }
   };
 
   return (
