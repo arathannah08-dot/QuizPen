@@ -1,6 +1,6 @@
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Alert, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import ActButton from '../../components/ui/ActButton';
 import Add from '../../components/ui/Add';
@@ -149,24 +149,7 @@ export default function CreateQuiz() {
 
         <ActButton 
          name="Save Quiz Set"
-         onPress={async() => {
-          await saveQuiz({
-            title: title,
-            desc: desc,
-            quiz: quiz
-          });
-
-          setTitle('');
-          setDesc('');
-          setQuiz([
-            {
-              question: '',
-              answer: ''
-            }
-          ]);
-
-          router.push('/(tabs)/quizzes');
-         }}
+         onPress={handleSave}
         />
 
       </ScrollView>
