@@ -1,9 +1,9 @@
 import { useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
 import {
-  ScrollView,
-  StyleSheet,
-  Text
+    ScrollView,
+    StyleSheet,
+    Text
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -82,9 +82,10 @@ export default function Home() {
                 </Text>
 
                 {quizzes
+                    .map((item, index) => ({ item, index }))
                     .slice(-3)
                     .reverse()
-                    .map((item, index) => (
+                    .map(({ item, index }) => (
                         <Display
                             key={index}
                             title={item.title}
@@ -93,8 +94,8 @@ export default function Home() {
                             name="Questions"
                             onPress={() =>
                                 router.push({
-                                    pathname: '/screens/quizscreens/[id]',
-                                    params: { id: index }
+                                    pathname: '/screens/quizscreen/[id]',
+                                    params: { id: String(index) }
                                 })
                             }
                         />

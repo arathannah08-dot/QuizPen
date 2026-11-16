@@ -11,7 +11,6 @@ export const saveQuiz = async (quiz) => {
 
         const data = await AsyncStorage.getItem('quizzes');
         const quizzes = data ? JSON.parse(data) : [];
-
         const newQuiz = {
             ...quiz,
             id: Date.now().toString(),
@@ -36,7 +35,6 @@ export const saveQuiz = async (quiz) => {
 export const getQuiz = async () => {
     try {
         const currentUser = await getCurrentUser();
-
         if (!currentUser) {
             return [];
         }
@@ -85,6 +83,13 @@ export const deleteQuiz = async (index) => {
         await AsyncStorage.setItem(
             'quizzes',
             JSON.stringify(updatedQuizzes)
+        );
+
+        return true;
+
+        await AsyncStorage.setItem(
+            'quizzes',
+            JSON.stringify(quizzes)
         );
 
         return true;
