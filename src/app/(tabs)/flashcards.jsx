@@ -83,8 +83,7 @@ export default function Flashcards() {
                                     onPress: async () => {
                                         await deleteFlashcard(index);
 
-                                        const data =
-                                            await getFlashcard();
+                                        const data = await getFlashcard();
 
                                         setFlashcards(data || []);
                                     },
