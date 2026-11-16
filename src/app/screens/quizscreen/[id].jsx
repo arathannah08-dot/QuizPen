@@ -1,117 +1,276 @@
+
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import {
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View
+} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import ActButton from '../../../components/ui/ActButton';
 import { getQuiz } from '../../../storage/quiz';
 
-export default function Flashscreen() {
-  const router = useRouter();
+// Shuffle choices randomly
+const shuffleArray = (array) => {
+  const shuffled = [...array];
+
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+
+    [shuffled[i], shuffled[j]] = [
+      shuffled[j],
+      shuffled[i]
+    ];
+  }
+
+  return shuffled;
+};
+
+// Automatically generate multiple choices
+const generateChoices = (quiz) => {
+
+  return quiz.map((item, index) => {
+
+    // Get correct answers from OTHER questions only
+    const wrongAnswers = quiz
+      .filter((otherItem, otherIndex) =>
+        otherIndex !== index
+      )
+      .map(otherItem => otherItem.answer);
+
+    // Randomly select 3 incorrect answers
+    const randomWrongAnswers = shuffleArray(
+      wrongAnswers
+    ).slice(0, 3);
+
+    // Combine correct and incorrect answers
+    const choices = shuffleArray([
+      item.answer,
+      ...randomWrongAnswers
+    ]);
+
+    return {
+      question: item.question,
+      options: choices,
+      correctAnswer: choices.findIndex(
+        answer => answer.toLowerCase() ===
+          item.answer.toLowerCase()
+      )
+    };
+  });
+};
+
+export default function QuizScreen() {
   const { id } = useLocalSearchParams();
+  const router = useRouter();
 
-  const [quiz, setQuiz] = useState(null);
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [showAnswer, setShowAnswer] = useState(false);
+  const [quizData, setQuizData] = useState(null);
+  const [current, setCurrent] = useState(0);
+  const [selected, setSelected] = useState(null);
+  const [score, setScore] = useState(0);
+  const [answered, setAnswered] = useState(false);
+  const [finished, setFinished] = useState(false);
 
+  // Load quiz
   useEffect(() => {
-    const loadQuizzes = async () => {
-      const data = await getQuiz();
+    const loadQuiz = async () => {
+      try {
+        const data = await getQuiz();
 
-      if (data) {
-        setQuiz(data[Number(id)] || null);
+        const savedQuiz = data[Number(id)];
+
+        if (savedQuiz && savedQuiz.quiz) {
+
+          // Generate choices automatically
+          const generatedQuiz = generateChoices(
+            savedQuiz.quiz
+          );
+
+          setQuizData({
+            ...savedQuiz,
+            quiz: generatedQuiz
+          });
+
+        } else {
+          console.log('Quiz not found.');
+        }
+
+      } catch (error) {
+        console.log('Error loading quiz:', error);
       }
     };
 
-    loadQuizzes();
+    loadQuiz();
   }, [id]);
 
-  if (!quiz) {
+  if (!quizData) {
     return (
       <SafeAreaView style={styles.container}>
-        <Text>Loading quiz...</Text>
+        <Text style={styles.text}>Loading quiz...</Text>
       </SafeAreaView>
     );
   }
 
-  const cards = Array.isArray(quiz.quiz)
-    ? quiz.quiz
-    : [];
+  const question = quizData.quiz[current];
 
-  if (cards.length === 0) {
+  // Check selected answer
+  const checkAnswer = () => {
+    if (selected === null) return;
+
+    if (selected === question.correctAnswer) {
+      setScore(prev => prev + 1);
+    }
+
+    setAnswered(true);
+  };
+
+  // Go to next question
+  const nextQuestion = () => {
+    if (current + 1 < quizData.quiz.length) {
+      setCurrent(current + 1);
+      setSelected(null);
+      setAnswered(false);
+    } else {
+      setFinished(true);
+    }
+  };
+
+  // Quiz result
+  if (finished) {
     return (
       <SafeAreaView style={styles.container}>
-        <Text>No quiz questions available.</Text>
-        <ActButton
-          name="Go Back"
-          onPress={() => router.push('/(tabs)/quizzes')}
-        />
+        <View style={styles.result}>
+
+      <TouchableOpacity
+          style={styles.backButton}
+          onPress={() => router.back()}
+        >
+          <Text style={styles.backButtonText}>← Back</Text>
+        </TouchableOpacity>
+        
+          <Text style={styles.title}>
+            Quiz Completed!
+          </Text>
+
+          <Text style={styles.score}>
+            {score} / {quizData.quiz.length}
+          </Text>
+
+          <Text style={styles.text}>
+            Your Final Score
+          </Text>
+
+          <TouchableOpacity
+            style={styles.button}
+            onPress={() => router.back()}
+          >
+            <Text style={styles.buttonText}>
+              Back to Quizzes
+            </Text>
+          </TouchableOpacity>
+
+        </View>
       </SafeAreaView>
     );
   }
-
-  const currentCard = cards[currentIndex];
-
-  const nextCard = () => {
-    setCurrentIndex((currentIndex + 1) % cards.length);
-    setShowAnswer(false);
-  };
-
-  const previousCard = () => {
-    setCurrentIndex(
-      (currentIndex - 1 + cards.length) % cards.length
-    );
-    setShowAnswer(false);
-  };
 
   return (
     <SafeAreaView style={styles.container}>
-      <Text style={styles.title}>{quiz.title}</Text>
-      <Text style={styles.description}>{quiz.question}</Text>
-
-      <Text style={styles.counter}>
-        Card {currentIndex + 1} of {cards.length}
-      </Text>
-
-      <TouchableOpacity
-        style={styles.flashcard}
-        activeOpacity={0.8}
-        onPress={() => setShowAnswer(!showAnswer)}
-      >
-        <Text style={styles.label}>
-          {showAnswer ? 'ANSWER' : 'DESCRIPTION'}
-        </Text>
-
-        <Text style={styles.cardText}>
-          {showAnswer
-            ? currentCard.answer
-            : currentCard.description || currentCard.question || ''}
-        </Text>
-
-        <Text style={styles.tapText}>
-          Tap to {showAnswer ? 'see description' : 'reveal answer'}
-        </Text>
-      </TouchableOpacity>
-
-      <View style={styles.navigation}>
-        <TouchableOpacity
-          style={styles.navButton}
-          onPress={previousCard}
-        >
-          <Text style={styles.navText}>Previous</Text>
-        </TouchableOpacity>
+      <ScrollView contentContainerStyle={styles.content}>
 
         <TouchableOpacity
-          style={styles.navButton}
-          onPress={nextCard}
+          style={styles.backButton}
+          onPress={() => router.back()}
         >
-          <Text style={styles.navText}>Next</Text>
+          <Text style={styles.backButtonText}>← Back</Text>
         </TouchableOpacity>
-      </View>
 
-      <ActButton
-        name="Go Back"
-        onPress={() => router.push('/(tabs)/quizzes')}
-      />
+        <Text style={styles.title}>
+          {quizData.title}
+        </Text>
+
+        <Text style={styles.progress}>
+          Question {current + 1} of {quizData.quiz.length}
+        </Text>
+
+        <View style={styles.card}>
+
+          <Text style={styles.question}>
+            {question.question}
+          </Text>
+
+          {question.options.map((option, index) => {
+
+            const isCorrect =
+              answered &&
+              index === question.correctAnswer;
+
+            const isWrong =
+              answered &&
+              selected === index &&
+              index !== question.correctAnswer;
+
+            return (
+              <TouchableOpacity
+                key={index}
+                style={[
+                  styles.option,
+
+                  selected === index && !answered &&
+                    styles.selected,
+
+                  isCorrect && styles.correct,
+
+                  isWrong && styles.wrong
+                ]}
+                disabled={answered}
+                onPress={() => setSelected(index)}
+              >
+                <Text style={styles.optionText}>
+                  {String.fromCharCode(65 + index)}. {option}
+                </Text>
+              </TouchableOpacity>
+            );
+          })}
+
+          {answered && (
+            <Text style={styles.feedback}>
+              {selected === question.correctAnswer
+                ? 'Correct Answer!'
+                : `Incorrect! Correct answer: ${question.options[question.correctAnswer]}`}
+            </Text>
+          )}
+
+          {!answered ? (
+            <TouchableOpacity
+              style={[
+                styles.button,
+                selected === null && styles.disabled
+              ]}
+              disabled={selected === null}
+              onPress={checkAnswer}
+            >
+              <Text style={styles.buttonText}>
+                Check Answer
+              </Text>
+            </TouchableOpacity>
+          ) : (
+            <TouchableOpacity
+              style={styles.button}
+              onPress={nextQuestion}
+            >
+              <Text style={styles.buttonText}>
+                {current + 1 === quizData.quiz.length
+                  ? 'See Results'
+                  : 'Next Question'}
+              </Text>
+            </TouchableOpacity>
+          )}
+
+        </View>
+
+      </ScrollView>
     </SafeAreaView>
   );
 }
@@ -119,71 +278,123 @@ export default function Flashscreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 20
+    backgroundColor: '#3e0945'
+  },
+
+  content: {
+    padding: 20,
+    flexGrow: 1,
+    justifyContent: 'center'
   },
 
   title: {
     fontSize: 28,
     fontWeight: 'bold',
-    marginBottom: 5
+    color: '#e9e4f1',
+    textAlign: 'center',
+    marginBottom: 15
   },
 
-  description: {
-    fontSize: 15,
+  progress: {
+    color: '#e9e4f1',
+    textAlign: 'center',
     marginBottom: 20
   },
 
-  counter: {
-    textAlign: 'center',
-    marginBottom: 15,
-    fontSize: 15
+  card: {
+    backgroundColor: '#e9e4f1',
+    padding: 20,
+    borderRadius: 15
   },
 
-  flashcard: {
-    minHeight: 250,
-    backgroundColor: '#3e0945',
-    borderRadius: 15,
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 25
+  question: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginBottom: 20,
+    color: '#3e0945'
   },
 
-  label: {
-    color: '#FF4F87',
+  option: {
+    padding: 15,
+    borderWidth: 1,
+    borderColor: '#3e0945',
+    borderRadius: 10,
+    marginBottom: 12
+  },
+
+  optionText: {
+    fontSize: 16,
+    color: '#3e0945'
+  },
+
+  selected: {
+    backgroundColor: '#d5c2e3'
+  },
+
+  correct: {
+    backgroundColor: '#a5e6ad',
+    borderColor: 'green'
+  },
+
+  wrong: {
+    backgroundColor: '#f3aaaa',
+    borderColor: 'red'
+  },
+
+  feedback: {
     fontWeight: 'bold',
     fontSize: 16,
-    marginBottom: 20
+    marginVertical: 15,
+    color: '#3e0945'
   },
 
-  cardText: {
-    color: '#e9e4f1',
-    fontSize: 21,
-    fontWeight: 'bold',
-    textAlign: 'center'
-  },
-
-  tapText: {
-    color: '#c9bfd3',
-    marginTop: 25,
-    fontSize: 13
-  },
-
-  navigation: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginVertical: 20
-  },
-
-  navButton: {
-    backgroundColor: '#FF4F87',
-    padding: 12,
+  button: {
+    backgroundColor: '#3e0945',
+    padding: 15,
     borderRadius: 10,
-    minWidth: 100,
-    alignItems: 'center'
+    alignItems: 'center',
+    marginTop: 15
   },
 
-  navText: {
+  buttonText: {
     color: 'white',
-    fontWeight: 'bold'
-  }
+    fontWeight: 'bold',
+    fontSize: 16
+  },
+
+  disabled: {
+    opacity: 0.4
+  },
+
+  result: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20
+  },
+
+  score: {
+    fontSize: 55,
+    fontWeight: 'bold',
+    color: '#e9e4f1',
+    marginVertical: 15
+  },
+
+  text: {
+    color: '#e9e4f1',
+    fontSize: 18
+  },
+
+  backButton: {
+  alignSelf: 'flex-start',
+  marginBottom: 20,
+  paddingVertical: 8,
+  paddingHorizontal: 12
+},
+
+backButtonText: {
+  color: '#e9e4f1',
+  fontSize: 18,
+  fontWeight: 'bold'
+},
 });
