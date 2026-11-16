@@ -119,3 +119,45 @@ export const logoutAccount = async () => {
         console.log('Error logging out:', error);
     }
 };
+
+
+// update the password of the currently logged-in account
+export const changePassword = async (currentPassword, newPassword) => {
+  try {
+    const currentUser = await getCurrentUser();
+
+    if (!currentUser) {
+      return false;
+    }
+
+    // check if the current password is correct
+    if (currentUser.password !== currentPassword) {
+      return false;
+    }
+
+    const accounts = await getAccounts();
+
+    // find the currently logged-in account
+    const accountIndex = accounts.findIndex(
+      item => item.id === currentUser.id
+    );
+
+    if (accountIndex === -1) {
+      return false;
+    }
+
+    // update only that account's password
+    accounts[accountIndex].password = newPassword;
+
+    await AsyncStorage.setItem(
+      'accounts',
+      JSON.stringify(accounts)
+    );
+
+    return true;
+
+  } catch (error) {
+    console.log('Error changing password:', error);
+    return false;
+  }
+};
