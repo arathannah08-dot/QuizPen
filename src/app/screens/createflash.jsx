@@ -1,6 +1,6 @@
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
-import { Alert, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Alert, KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import ActButton from '../../components/ui/ActButton';
 import Add from '../../components/ui/Add';
@@ -84,19 +84,27 @@ export default function CreateFlash() {
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      <ScrollView style={styles.container}>
-        <View style={styles.header}>
-          <AddSign
-            icon="arrow-back-outline"
-            size={30}
-            color="black"
-            onPress={() => router.push('/(tabs)/create')}
-          />
+      <KeyboardAvoidingView
+        style={{ flex: 1 }}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      >
+        <ScrollView
+          style={styles.container}
+          keyboardShouldPersistTaps="handled"
+          keyboardDismissMode="on-drag"
+        >
+          <View style={styles.header}>
+            <AddSign
+              icon="arrow-back-outline"
+              size={30}
+              color="black"
+              onPress={() => router.push('/(tabs)/create')}
+            />
 
-          <Text style={styles.headerTxt}>
-            Create Flashcard
-          </Text>
-        </View>
+            <Text style={styles.headerTxt}>
+              Create Flashcard
+            </Text>
+          </View>
 
         <Text style={styles.subTxt}>Add Title</Text>
         <UserInput
@@ -151,6 +159,7 @@ export default function CreateFlash() {
           onPress={handleSave}
         />
       </ScrollView>
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 }
@@ -197,6 +206,11 @@ const styles = StyleSheet.create({
   },
 
   cards: {
-    marginBottom: 15
+    marginBottom: 20,
+    padding: 15,
+    backgroundColor: '#F8F5FC',
+    borderWidth: 1,
+    borderColor: '#E5DCEF',
+    borderRadius: 15
   }
 });
