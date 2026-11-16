@@ -1,5 +1,5 @@
 import { useRouter } from 'expo-router';
-import { useCallback, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { ScrollView, StyleSheet, Text } from 'react-native';
 import Display from '../../components/ui/Display';
 import SearchInput from '../../components/ui/SearchInput';
@@ -9,16 +9,14 @@ export default function Quizzes() {
     const router = useRouter();
     const [quizzes, setQuizzes] = useState([]);
 
-    useEffect(
-        useCallback(() => {
-            const loadQuizzes = async () => {
-                const data = await getQuiz();
-                setQuizzes(data || []);
-            };
+    useEffect(() => {
+        const loadQuizzes = async () => {
+            const data = await getQuiz();
+            setQuizzes(data || []);
+        };
 
-            loadQuizzes();
-        }, [])
-    );
+        loadQuizzes();
+    }, []);
 
     return (
         <ScrollView
@@ -39,12 +37,12 @@ export default function Quizzes() {
                     length={item.quiz ? item.quiz.length : 0}
                     name="Items"
 
-                    onPress={() =>
-                        router.push({
-                            pathname: '/screens/quizscreen/[id]',
-                            params: { id: index }
-                        })
-                    }
+            onPress={() =>
+                router.push({
+                    pathname: '/screens/quizscreen/[id]',
+                    params: { id: String(index) }
+                })
+            }
 
                     onDelete={async () => {
                         await deleteQuiz(index);
