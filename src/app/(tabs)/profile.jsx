@@ -1,3 +1,4 @@
+
 import { useRouter } from 'expo-router';
 import { StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -10,32 +11,34 @@ export default function Profile() {
 
     return (
         <SafeAreaView style={styles.container}>
-
-            <Text style={styles.header}>
-                My Account
-            </Text>
+            <Text style={styles.header}>My Account</Text>
 
             <View style={styles.statsBox}>
-                <Text style={styles.stat}>
-                    Sets
-                </Text>
-
-                <Text style={styles.stat}>
-                    Quizzes
-                </Text>
+                <Text style={styles.stat}>Sets</Text>
+                <Text style={styles.stat}>Quizzes</Text>
             </View>
 
             <View style={styles.options}>
-                <ActButton2 name="Performance" />
-                <ActButton2 name="Activity History" />
-                <ActButton2 name="Settings" />
+                <ActButton2
+                    name="Performance"
+                    onPress={() => router.push('/screens/performance')}
+                />
+
+                <ActButton2
+                    name="Activity History"
+                    onPress={() => router.push('/screens/activity')}
+                />
+
+                <ActButton2
+                    name="Settings"
+                    onPress={() => router.push('/screens/settings')}
+                />
             </View>
 
             <ActButton
                 name="Logout"
                 onPress={() => router.push('/')}
             />
-
         </SafeAreaView>
     );
 }
