@@ -1,6 +1,6 @@
 import { useRouter } from 'expo-router';
-import { useEffect, useState } from 'react';
-import { ScrollView, StyleSheet, Text } from 'react-native';
+import { useCallback, useEffect, useState } from 'react';
+import { Alert, ScrollView, StyleSheet, Text } from 'react-native';
 import Display from '../../components/ui/Display';
 import SearchInput from '../../components/ui/SearchInput';
 import { deleteQuiz, getQuiz } from '../../storage/quiz';
@@ -45,15 +45,31 @@ export default function Quizzes() {
             }
 
                     onDelete={async () => {
-                        await deleteQuiz(index);
+                        Alert.alert(
+                            'Delete Quiz',
+                            'Are you sure you want to delete this quiz?',
+                        [
+                            {
+                                text: 'Cancel',
+                                style: 'cancel',
+                            },
+                            {
+                                text: 'Delete',
+                                style: 'destructive',
+                                onPress: async () => {
+                                    await deleteQuiz(index);
+                                    
+                                    const data = await getQuiz();
 
-                        const data = await getQuiz();
-
-                        setQuizzes(data || []);
-                    }}
-                />
-            ))}
-        </ScrollView>
+                                    setQuizzes(data || []);
+                                },
+                            },
+                        ]
+                    );
+                }}    
+            />
+        ))}
+    </ScrollView>
     );
 }
 

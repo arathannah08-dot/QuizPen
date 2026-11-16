@@ -226,9 +226,9 @@ export default function CreateQuiz() {
           </View>
         ))}
 
-        <ActButton
-          name="Save Quiz Set"
-          onPress={handleSave}
+        <ActButton 
+         name="Save Quiz Set"
+         onPress={handleSave}
         />
 
       </ScrollView>
