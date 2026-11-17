@@ -16,14 +16,20 @@ export default function CreateFlash() {
 
   // Each flashcard has its own description and answer
   const [flash, setFlash] = useState([
-    { description: '', answer: '' }
+    { 
+      description: '', 
+      answer: '' 
+    }
   ]);
 
   // Add another flashcard
   const addFlash = () => {
     setFlash([
       ...flash,
-      { description: '', answer: '' }
+      { 
+        description: '',
+        answer: '' 
+      }
     ]);
   };
 
