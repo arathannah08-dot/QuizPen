@@ -9,7 +9,7 @@ import {
   View
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { getQuiz } from '../../../storage/quiz';
+import { getQuiz, saveQuizResult } from '../../../storage/quiz';
 
 // Shuffle choices randomly
 const shuffleArray = (array) => {
@@ -126,14 +126,24 @@ export default function QuizScreen() {
   };
 
   // Go to next question
-  const nextQuestion = () => {
-    if (current + 1 < quizData.quiz.length) {
-      setCurrent(current + 1);
-      setSelected(null);
-      setAnswered(false);
-    } else {
-      setFinished(true);
-    }
+  const nextQuestion = async () => {
+      if (current + 1 < quizData.quiz.length) {
+          setCurrent(current + 1);
+          setSelected(null);
+          setAnswered(false);
+      } else {
+          const saved = await saveQuizResult(
+              quizData.id,
+              score,
+              quizData.quiz.length
+          );
+
+          if (!saved) {
+              console.log('Unable to save quiz result.');
+          }
+
+          setFinished(true);
+      }
   };
 
   // Quiz result
