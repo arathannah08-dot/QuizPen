@@ -1,16 +1,21 @@
+
 import { StyleSheet, Text, TouchableOpacity } from 'react-native';
 
-export default function ActButton2 ({name}) {
+export default function ActButton2({ name, onPress }) {
     return (
-        <TouchableOpacity style={styles.actBtn}>
+        <TouchableOpacity
+            style={styles.actBtn}
+            onPress={onPress}
+            activeOpacity={0.7}
+        >
             <Text style={styles.actTxt}>{name}</Text>
         </TouchableOpacity>
     );
 }
 
-const styles =StyleSheet.create ({
+const styles = StyleSheet.create({
     actBtn: {
-        padding: 10
+        padding: 10,
     },
 
     actTxt: {
@@ -19,5 +24,5 @@ const styles =StyleSheet.create ({
         textAlign: 'left',
         fontSize: 14,
         fontWeight: '600',
-    }
-})
+    },
+});

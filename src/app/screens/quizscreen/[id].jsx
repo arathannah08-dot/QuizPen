@@ -10,7 +10,7 @@ import {
   View
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { getQuiz } from '../../../storage/quiz';
+import { getQuiz, saveQuizResult } from '../../../storage/quiz';
 
 const TIMER_DURATION = 15;
 
@@ -186,6 +186,7 @@ export default function QuizScreen() {
 
     setAnswered(true);
   };
+
 
   // Next question
   const nextQuestion = () => {
