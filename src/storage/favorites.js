@@ -3,7 +3,7 @@ import { getCurrentUser } from './account';
 
 const FAVORITES_KEY = 'favorites';
 
-export const getFavoriteIds = async (itemType, itemId) => {
+export const getFavoriteIds = async (itemType) => {
     try {
         const currentUser = await getCurrentUser();
         
@@ -23,7 +23,7 @@ export const getFavoriteIds = async (itemType, itemId) => {
     }
 };
 
-export const Favorite = async (itemId, itemType) => {
+export const Favorite = async (itemType, itemId) => {
     try {
         const currentUser = await getCurrentUser();
 
