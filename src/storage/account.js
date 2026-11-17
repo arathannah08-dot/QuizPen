@@ -1,52 +1,18 @@
+
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-
-export const saveAccount = async (account) => {
-    try {
-        const accounts = await getAccounts();
-    
-
-    //check if email is alr registered
-    const existingAccount = accounts.find(
-        item => item.email.toLowerCase() === account.email.toLowerCase()
-    );
-
-    if (existingAccount) {
-        return false;
-    }
-
-    const newAccount = {
-        ...account,
-        id: Date.now().toString()
-    };
-
-    accounts.push(newAccount);
-
-    await AsyncStorage.setItem(
-        'accounts',
-        JSON.stringify(accounts)
-    );
-
-    return true;
-
-} catch (error) {
-    console.log('Error saving account:', error);
-    return false;
-}
-};
-
-
-//retrieve all accounts
+// Get all registered accounts
 export const getAccounts = async () => {
     try {
         const data = await AsyncStorage.getItem('accounts');
-
 
         if (data) {
             return JSON.parse(data);
         }
 
-        //migrate the prev saved acc
+        // Retrieve old saved account if available
+        const oldAccount = await AsyncStorage.getItem('account');
+
         if (oldAccount) {
             const account = JSON.parse(oldAccount);
 
@@ -72,16 +38,57 @@ export const getAccounts = async () => {
     }
 };
 
-// find an acc using its email
+
+// Save new account
+export const saveAccount = async (account) => {
+    try {
+        const accounts = await getAccounts();
+
+        const existingAccount = accounts.find(
+            item =>
+                item.email.toLowerCase() ===
+                account.email.trim().toLowerCase()
+        );
+
+        if (existingAccount) {
+            return false;
+        }
+
+        const newAccount = {
+            ...account,
+            email: account.email.trim().toLowerCase(),
+            id: Date.now().toString()
+        };
+
+        accounts.push(newAccount);
+
+        await AsyncStorage.setItem(
+            'accounts',
+            JSON.stringify(accounts)
+        );
+
+        return true;
+
+    } catch (error) {
+        console.log('Error saving account:', error);
+        return false;
+    }
+};
+
+
+// Find account using email
 export const getAccountByEmail = async (email) => {
     const accounts = await getAccounts();
 
     return accounts.find(
-        item => item.email.toLowerCase() === email.toLowerCase()
+        item =>
+            item.email.toLowerCase() ===
+            email.trim().toLowerCase()
     ) || null;
 };
 
-// save the currently logged-in account ID
+
+// Save current logged-in user
 export const setCurrentUser = async (accountId) => {
     try {
         await AsyncStorage.setItem('currentUser', accountId);
@@ -90,7 +97,8 @@ export const setCurrentUser = async (accountId) => {
     }
 };
 
-// get the currently logged-in account
+
+// Get current logged-in user
 export const getCurrentUser = async () => {
     try {
         const accountId = await AsyncStorage.getItem('currentUser');
@@ -111,7 +119,8 @@ export const getCurrentUser = async () => {
     }
 };
 
-// log out the current account
+
+// Logout current user
 export const logoutAccount = async () => {
     try {
         await AsyncStorage.removeItem('currentUser');
@@ -161,3 +170,4 @@ export const changePassword = async (currentPassword, newPassword) => {
     return false;
   }
 };
+
