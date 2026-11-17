@@ -43,7 +43,7 @@ export default function Flashcards() {
         }, [loadData])
     );  
 
-    const handleFavorite = async (index) => {
+    const handleFavorite = async (itemId) => {
         const success = await Favorite('flashcard', itemId);
     
         if (success) {
@@ -70,7 +70,7 @@ export default function Flashcards() {
                 <SearchInput type="Search flashcard ..." />
             </View>
 
-            <View styles={styles.filterContainer}>
+            <View style={styles.filterContainer}>
 
                 {['All', 'Favorites'].map(filter => (
                 <TouchableOpacity
@@ -83,7 +83,7 @@ export default function Flashcards() {
                 >
                     <Text
                         style={[
-                            styles.filterButton,
+                            styles.filterText,
                             selectedFilter === filter && styles.activeFilterText
                         ]}
                     >
@@ -100,7 +100,7 @@ export default function Flashcards() {
                     return (
                         
                 <Display
-                    key={index}
+                    key={item.id}
                     title={item.title}
                     desc={item.desc}
                     length={item.flash ? item.flash.length : 0}
@@ -113,14 +113,14 @@ export default function Flashcards() {
                     onPress={() =>
                         router.push({
                             pathname: '/screens/flashscreen/[id]',
-                            params: { id: index }
+                            params: { id: Index }
                         })
                     }
 
                     onEdit={() =>
                         router.push({
                             pathname: '/screens/editflash',
-                            params: { id: index }
+                            params: { id: Index }
                         })
                     }
 
@@ -137,7 +137,7 @@ export default function Flashcards() {
                                     text: 'Delete',
                                     style: 'destructive',
                                     onPress: async () => {
-                                            await deleteFlashcard(originalIndex);
+                                            await deleteFlashcard(Index);
                                             await loadData();
                                     },
                                 },
@@ -145,9 +145,9 @@ export default function Flashcards() {
                         );
                     }}
                 />
-                    );
-           })
-        ) : (
+            );
+        })
+    ) : (
             <Text style={styles.emptyText} >
                 {selectedFilter === 'Favorites'
                     ? 'You have no favorite flashcards yet.'

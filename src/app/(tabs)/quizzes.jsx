@@ -26,7 +26,7 @@ export default function Quizzes() {
         }, [loadData])
     );
 
-    const handleFavorite = async (index) => {
+    const handleFavorite = async (itemId) => {
         const success = await Favorite('quiz', itemId);
 
         if (success) {
@@ -86,12 +86,16 @@ export default function Quizzes() {
                     length={item.quiz ? item.quiz.length : 0}
                     name="Items"
 
-            onPress={() =>
-                router.push({
-                    pathname: '/screens/quizscreen/[id]',
-                    params: { id: String(index) }
-                })
-            }
+                    isFavorite={favoriteIds.includes(item.id)}
+                    
+                    onFavorite={() => handleFavorite(item.id)}
+                    
+                    onPress={() =>
+                        router.push({
+                            pathname: '/screens/quizscreen/[id]',
+                            params: { id: String(originalIndex) }
+                        })
+                    }
 
                     onDelete={async () => {
                         Alert.alert(
