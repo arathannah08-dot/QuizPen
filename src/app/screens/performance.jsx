@@ -124,8 +124,7 @@ export default function Performance() {
                     </Text>
 
                     <Text style={styles.infoText}>
-                        80% or higher = Mastered
-                        <br></br>
+                        80% or higher = Mastered{"\n"}
                         Lower than 80% = Needs More Review
                     </Text>
                 </View>

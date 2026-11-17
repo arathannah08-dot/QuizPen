@@ -35,14 +35,14 @@ export default function About() {
           QuizPen is a mobile application that allows users
           to create, organize, and study flashcards and quizzes.
           
-          <br></br>
-          <br></br>
+          {"\n"}
+          {"\n"}
           
           It helps make reviewing and learning easier and more
           convenient.
 
-          <br></br>
-          <br></br>
+          {"\n"}
+          {"\n"}
 
           By:
           Arat, Bacarro, Gomez, Heras, and Sabio
