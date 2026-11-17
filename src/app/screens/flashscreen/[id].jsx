@@ -1,10 +1,27 @@
 
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useEffect, useState } from "react";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import {
+    Pressable,
+    StyleSheet,
+    Switch,
+    Text,
+    View
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import ActButton from "../../../components/ui/ActButton";
 import { getFlashcard } from "../../../storage/flashcard";
+
+const shuffleArray = (array) => {
+    const shuffled = [...array];
+
+    for (let i = shuffled.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+    }
+
+    return shuffled;
+};
 
 export default function Flashscreen() {
     const router = useRouter();
@@ -15,6 +32,10 @@ export default function Flashscreen() {
     const [currentIndex, setCurrentIndex] = useState(0);
     const [showAnswer, setShowAnswer] = useState(false);
 
+    const [showSettings, setShowSettings] = useState(false);
+    const [shuffleEnabled, setShuffleEnabled] = useState(false);
+    const [cards, setCards] = useState([]);
+
     useEffect(() => {
         const loadFlashcards = async () => {
             try {
@@ -22,6 +43,7 @@ export default function Flashscreen() {
                 const selected = data?.[Number(id)];
 
                 setFlashcard(selected || null);
+                setCards(Array.isArray(selected?.flash) ? selected.flash : []);
             } catch (error) {
                 console.log("Error loading flashcards:", error);
                 setFlashcard(null);
@@ -32,11 +54,6 @@ export default function Flashscreen() {
 
         loadFlashcards();
     }, [id]);
-
-    // Get the flashcards safely
-    const cards = Array.isArray(flashcard?.flash)
-        ? flashcard.flash
-        : [];
 
     const currentCard = cards[currentIndex];
 
@@ -67,6 +84,21 @@ export default function Flashscreen() {
             setCurrentIndex(previous => previous - 1);
             setShowAnswer(false);
         }
+    };
+
+    const applySettings = () => {
+        const originalCards = Array.isArray(flashcard?.flash)
+            ? flashcard.flash
+            : [];
+
+        const updatedCards = shuffleEnabled
+            ? shuffleArray(originalCards)
+            : [...originalCards];
+
+        setCards(updatedCards);
+        setCurrentIndex(0);
+        setShowAnswer(false);
+        setShowSettings(false);
     };
 
     if (loading) {
@@ -104,60 +136,138 @@ export default function Flashscreen() {
 
     return (
         <SafeAreaView style={styles.container}>
-            <Text style={styles.header}>Flashcard Set</Text>
-
-            <Text style={styles.title}>{flashcard.title}</Text>
-            <Text style={styles.description}>{flashcard.desc}</Text>
-
-            <Text style={styles.counter}>
-                Card {currentIndex + 1} of {cards.length}
-            </Text>
-
-            <Pressable
-                style={styles.card}
-                onPress={flipCard}
-            >
-                <Text style={styles.label}>
-                    {showAnswer ? "ANSWER" : "DESCRIPTION"}
-                </Text>
-
-                <Text style={styles.cardText}>
-                    {showAnswer ? answer : question}
-                </Text>
-
-                <Text style={styles.hint}>
-                    Tap to {showAnswer ? "see description" : "reveal answer"}
-                </Text>
-            </Pressable>
-
-            <View style={styles.navigation}>
-                <Pressable
-                    style={[
-                        styles.navButton,
-                        currentIndex === 0 && styles.disabled
-                    ]}
-                    onPress={previousCard}
-                    disabled={currentIndex === 0}
-                >
-                    <Text style={styles.buttonText}>Previous</Text>
-                </Pressable>
+            <View style={styles.topBar}>
+                <Text style={styles.header}>Flashcard Set</Text>
 
                 <Pressable
-                    style={[
-                        styles.navButton,
-                        currentIndex === cards.length - 1 && styles.disabled
-                    ]}
-                    onPress={nextCard}
-                    disabled={currentIndex === cards.length - 1}
+                    style={styles.settingsButton}
+                    onPress={() => setShowSettings(true)}
                 >
-                    <Text style={styles.buttonText}>Next</Text>
+                    <Text style={styles.settingsButtonText}>
+                        ⚙ Settings
+                    </Text>
                 </Pressable>
             </View>
 
-            <ActButton
-                name="Go Back"
-                onPress={() => router.back()}
-            />
+            {showSettings ? (
+                <View style={styles.settingsCard}>
+                    <Text style={styles.settingsTitle}>
+                        Flashcard Settings
+                    </Text>
+
+                    <Text style={styles.settingsDescription}>
+                        Customize how your flashcards are displayed.
+                    </Text>
+
+                    <Text style={styles.sectionTitle}>
+                        Flashcard Preferences
+                    </Text>
+
+                    <View style={styles.switchOption}>
+                        <View style={styles.switchInfo}>
+                            <Text style={styles.settingText}>
+                                Shuffle Flashcards
+                            </Text>
+
+                            <Text style={styles.settingDescription}>
+                                Display flashcards in random order.
+                            </Text>
+                        </View>
+
+                        <Switch
+                            value={shuffleEnabled}
+                            onValueChange={setShuffleEnabled}
+                            trackColor={{
+                                false: "#CCCCCC",
+                                true: "#FF4F87"
+                            }}
+                            thumbColor="#FFFFFF"
+                        />
+                    </View>
+
+                    <Pressable
+                        style={styles.applyButton}
+                        onPress={applySettings}
+                    >
+                        <Text style={styles.buttonText}>
+                            Apply Settings
+                        </Text>
+                    </Pressable>
+
+                    <Pressable
+                        style={styles.cancelButton}
+                        onPress={() => setShowSettings(false)}
+                    >
+                        <Text style={styles.cancelText}>
+                            Cancel
+                        </Text>
+                    </Pressable>
+                </View>
+            ) : (
+                <>
+                    <Text style={styles.title}>{flashcard.title}</Text>
+                    <Text style={styles.description}>
+                        {flashcard.desc}
+                    </Text>
+
+                    <Text style={styles.counter}>
+                        Card {currentIndex + 1} of {cards.length}
+                    </Text>
+
+                    <Pressable
+                        style={styles.card}
+                        onPress={flipCard}
+                    >
+                        <Text style={styles.label}>
+                            {showAnswer ? "ANSWER" : "DESCRIPTION"}
+                        </Text>
+
+                        <Text style={styles.cardText}>
+                            {showAnswer ? answer : question}
+                        </Text>
+
+                        <Text style={styles.hint}>
+                            Tap to {showAnswer
+                                ? "see description"
+                                : "reveal answer"}
+                        </Text>
+                    </Pressable>
+
+                    <View style={styles.navigation}>
+                        <Pressable
+                            style={[
+                                styles.navButton,
+                                currentIndex === 0 && styles.disabled
+                            ]}
+                            onPress={previousCard}
+                            disabled={currentIndex === 0}
+                        >
+                            <Text style={styles.buttonText}>
+                                Previous
+                            </Text>
+                        </Pressable>
+
+                        <Pressable
+                            style={[
+                                styles.navButton,
+                                currentIndex === cards.length - 1 &&
+                                styles.disabled
+                            ]}
+                            onPress={nextCard}
+                            disabled={currentIndex === cards.length - 1}
+                        >
+                            <Text style={styles.buttonText}>
+                                Next
+                            </Text>
+                        </Pressable>
+                    </View>
+
+                    <ActButton
+                        name="Go Back"
+                        onPress={() => router.back()}
+                    />
+                </>
+            )}
         </SafeAreaView>
     );
 }
@@ -169,10 +279,27 @@ const styles = StyleSheet.create({
         backgroundColor: '#F8F8F8',
     },
 
+    topBar: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginBottom: 20,
+    },
+
     header: {
         fontSize: 28,
         fontWeight: 'bold',
-        marginBottom: 20,
+    },
+
+    settingsButton: {
+        backgroundColor: '#FF4F87',
+        padding: 10,
+        borderRadius: 10,
+    },
+
+    settingsButtonText: {
+        color: '#FFFFFF',
+        fontWeight: 'bold',
     },
 
     title: {
@@ -247,5 +374,80 @@ const styles = StyleSheet.create({
 
     disabled: {
         backgroundColor: '#CCCCCC',
+    },
+
+    settingsCard: {
+        backgroundColor: '#FFFFFF',
+        padding: 20,
+        borderRadius: 15,
+        borderWidth: 1,
+        borderColor: '#EEEEEE',
+        elevation: 3,
+    },
+
+    settingsTitle: {
+        fontSize: 23,
+        fontWeight: 'bold',
+        marginBottom: 8,
+        color: '#333',
+    },
+
+    settingsDescription: {
+        fontSize: 14,
+        color: '#777',
+        marginBottom: 25,
+    },
+
+    sectionTitle: {
+        fontSize: 17,
+        fontWeight: 'bold',
+        marginBottom: 15,
+        color: '#FF4F87',
+    },
+
+    switchOption: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        paddingVertical: 15,
+        borderTopWidth: 1,
+        borderBottomWidth: 1,
+        borderColor: '#EEEEEE',
+        marginBottom: 25,
+    },
+
+    switchInfo: {
+        flex: 1,
+        marginRight: 10,
+    },
+
+    settingText: {
+        fontSize: 16,
+        fontWeight: 'bold',
+        color: '#333',
+    },
+
+    settingDescription: {
+        fontSize: 13,
+        color: '#777',
+        marginTop: 5,
+    },
+
+    applyButton: {
+        backgroundColor: '#FF4F87',
+        padding: 15,
+        borderRadius: 10,
+        alignItems: 'center',
+    },
+
+    cancelButton: {
+        padding: 15,
+        alignItems: 'center',
+        marginTop: 5,
+    },
+
+    cancelText: {
+        color: '#FF4F87',
+        fontWeight: 'bold',
     },
 });
