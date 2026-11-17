@@ -113,14 +113,14 @@ export default function Flashcards() {
                     onPress={() =>
                         router.push({
                             pathname: '/screens/flashscreen/[id]',
-                            params: { id: Index }
+                            params: { id: index }
                         })
                     }
 
                     onEdit={() =>
                         router.push({
                             pathname: '/screens/editflash',
-                            params: { id: Index }
+                            params: { id: index }
                         })
                     }
 
@@ -137,7 +137,7 @@ export default function Flashcards() {
                                     text: 'Delete',
                                     style: 'destructive',
                                     onPress: async () => {
-                                            await deleteFlashcard(Index);
+                                            await deleteFlashcard(index);
                                             await loadData();
                                     },
                                 },
