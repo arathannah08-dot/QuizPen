@@ -4,7 +4,6 @@ import { useEffect, useState } from "react";
 import {
     Pressable,
     StyleSheet,
-    Switch,
     Text,
     View
 } from "react-native";
@@ -12,12 +11,17 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import ActButton from "../../../components/ui/ActButton";
 import { getFlashcard } from "../../../storage/flashcard";
 
+// Shuffle flashcards
 const shuffleArray = (array) => {
     const shuffled = [...array];
 
     for (let i = shuffled.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
-        [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+
+        [shuffled[i], shuffled[j]] = [
+            shuffled[j],
+            shuffled[i]
+        ];
     }
 
     return shuffled;
@@ -29,21 +33,36 @@ export default function Flashscreen() {
 
     const [flashcard, setFlashcard] = useState(null);
     const [loading, setLoading] = useState(true);
+
+    const [cards, setCards] = useState([]);
+    const [originalCards, setOriginalCards] = useState([]);
+
     const [currentIndex, setCurrentIndex] = useState(0);
     const [showAnswer, setShowAnswer] = useState(false);
 
+    // Settings
     const [showSettings, setShowSettings] = useState(false);
-    const [shuffleEnabled, setShuffleEnabled] = useState(false);
-    const [cards, setCards] = useState([]);
+    const [cardOrder, setCardOrder] = useState("chronological");
 
+    // Load flashcards
     useEffect(() => {
         const loadFlashcards = async () => {
             try {
                 const data = await getFlashcard();
                 const selected = data?.[Number(id)];
 
-                setFlashcard(selected || null);
-                setCards(Array.isArray(selected?.flash) ? selected.flash : []);
+                if (selected) {
+                    const savedCards = Array.isArray(selected.flash)
+                        ? selected.flash
+                        : [];
+
+                    setFlashcard(selected);
+                    setOriginalCards(savedCards);
+                    setCards(savedCards);
+                } else {
+                    setFlashcard(null);
+                }
+
             } catch (error) {
                 console.log("Error loading flashcards:", error);
                 setFlashcard(null);
@@ -57,7 +76,7 @@ export default function Flashscreen() {
 
     const currentCard = cards[currentIndex];
 
-    // Support both new and old saved formats
+    // Support old and new saved formats
     const question = typeof currentCard === "string"
         ? currentCard
         : currentCard?.description ||
@@ -68,10 +87,12 @@ export default function Flashscreen() {
         ? currentCard?.answer || ""
         : "";
 
+    // Flip card
     const flipCard = () => {
         setShowAnswer(previous => !previous);
     };
 
+    // Next card
     const nextCard = () => {
         if (currentIndex < cards.length - 1) {
             setCurrentIndex(previous => previous + 1);
@@ -79,6 +100,7 @@ export default function Flashscreen() {
         }
     };
 
+    // Previous card
     const previousCard = () => {
         if (currentIndex > 0) {
             setCurrentIndex(previous => previous - 1);
@@ -86,16 +108,15 @@ export default function Flashscreen() {
         }
     };
 
+    // Apply settings
     const applySettings = () => {
-        const originalCards = Array.isArray(flashcard?.flash)
-            ? flashcard.flash
-            : [];
-
-        const updatedCards = shuffleEnabled
+        const orderedCards = cardOrder === "shuffle"
             ? shuffleArray(originalCards)
             : [...originalCards];
 
-        setCards(updatedCards);
+        setCards(orderedCards);
+
+        // Reset flashcard progress
         setCurrentIndex(0);
         setShowAnswer(false);
         setShowSettings(false);
@@ -113,6 +134,7 @@ export default function Flashscreen() {
         return (
             <SafeAreaView style={styles.container}>
                 <Text>Flashcard set not found.</Text>
+
                 <ActButton
                     name="Go Back"
                     onPress={() => router.back()}
@@ -126,6 +148,7 @@ export default function Flashscreen() {
             <SafeAreaView style={styles.container}>
                 <Text style={styles.header}>{flashcard.title}</Text>
                 <Text>No flashcards available in this set.</Text>
+
                 <ActButton
                     name="Go Back"
                     onPress={() => router.back()}
@@ -136,12 +159,14 @@ export default function Flashscreen() {
 
     return (
         <SafeAreaView style={styles.container}>
+
+            {/* Top Bar */}
             <View style={styles.topBar}>
                 <Text style={styles.header}>Flashcard Set</Text>
 
                 <Pressable
                     style={styles.settingsButton}
-                    onPress={() => setShowSettings(true)}
+                    onPress={() => setShowSettings(!showSettings)}
                 >
                     <Text style={styles.settingsButtonText}>
                         ⚙ Settings
@@ -149,51 +174,73 @@ export default function Flashscreen() {
                 </Pressable>
             </View>
 
+            <Text style={styles.title}>{flashcard.title}</Text>
+            <Text style={styles.description}>{flashcard.desc}</Text>
+
             {showSettings ? (
+
+                /* SETTINGS */
                 <View style={styles.settingsCard}>
+
                     <Text style={styles.settingsTitle}>
                         Flashcard Settings
                     </Text>
 
                     <Text style={styles.settingsDescription}>
-                        Customize how your flashcards are displayed.
+                        Choose how you want to study your flashcards.
                     </Text>
 
                     <Text style={styles.sectionTitle}>
-                        Flashcard Preferences
+                        Card Preferences
                     </Text>
 
-                    <View style={styles.switchOption}>
-                        <View style={styles.switchInfo}>
-                            <Text style={styles.settingText}>
-                                Shuffle Flashcards
-                            </Text>
+                    {/* Shuffle */}
+                    <Pressable
+                        style={[
+                            styles.settingOption,
+                            cardOrder === "shuffle" &&
+                                styles.settingSelected
+                        ]}
+                        onPress={() => setCardOrder("shuffle")}
+                    >
+                        <Text style={styles.settingText}>
+                            🔀 Shuffle Flashcards
+                        </Text>
 
-                            <Text style={styles.settingDescription}>
-                                Display flashcards in random order.
-                            </Text>
-                        </View>
+                        <Text style={styles.optionDescription}>
+                            Display flashcards in random order.
+                        </Text>
+                    </Pressable>
 
-                        <Switch
-                            value={shuffleEnabled}
-                            onValueChange={setShuffleEnabled}
-                            trackColor={{
-                                false: "#CCCCCC",
-                                true: "#FF4F87"
-                            }}
-                            thumbColor="#FFFFFF"
-                        />
-                    </View>
+                    {/* Chronological */}
+                    <Pressable
+                        style={[
+                            styles.settingOption,
+                            cardOrder === "chronological" &&
+                                styles.settingSelected
+                        ]}
+                        onPress={() => setCardOrder("chronological")}
+                    >
+                        <Text style={styles.settingText}>
+                            🔢 Chronological Order
+                        </Text>
 
+                        <Text style={styles.optionDescription}>
+                            Follow the original flashcard order.
+                        </Text>
+                    </Pressable>
+
+                    {/* Apply */}
                     <Pressable
                         style={styles.applyButton}
                         onPress={applySettings}
                     >
-                        <Text style={styles.buttonText}>
+                        <Text style={styles.applyButtonText}>
                             Apply Settings
                         </Text>
                     </Pressable>
 
+                    {/* Cancel */}
                     <Pressable
                         style={styles.cancelButton}
                         onPress={() => setShowSettings(false)}
@@ -202,14 +249,13 @@ export default function Flashscreen() {
                             Cancel
                         </Text>
                     </Pressable>
-                </View>
-            ) : (
-                <>
-                    <Text style={styles.title}>{flashcard.title}</Text>
-                    <Text style={styles.description}>
-                        {flashcard.desc}
-                    </Text>
 
+                </View>
+
+            ) : (
+
+                /* FLASHCARDS */
+                <>
                     <Text style={styles.counter}>
                         Card {currentIndex + 1} of {cards.length}
                     </Text>
@@ -233,7 +279,9 @@ export default function Flashscreen() {
                         </Text>
                     </Pressable>
 
+                    {/* Navigation */}
                     <View style={styles.navigation}>
+
                         <Pressable
                             style={[
                                 styles.navButton,
@@ -251,7 +299,7 @@ export default function Flashscreen() {
                             style={[
                                 styles.navButton,
                                 currentIndex === cards.length - 1 &&
-                                styles.disabled
+                                    styles.disabled
                             ]}
                             onPress={nextCard}
                             disabled={currentIndex === cards.length - 1}
@@ -260,14 +308,16 @@ export default function Flashscreen() {
                                 Next
                             </Text>
                         </Pressable>
-                    </View>
 
-                    <ActButton
-                        name="Go Back"
-                        onPress={() => router.back()}
-                    />
+                    </View>
                 </>
             )}
+
+            <ActButton
+                name="Go Back"
+                onPress={() => router.back()}
+            />
+
         </SafeAreaView>
     );
 }
@@ -283,23 +333,24 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        marginBottom: 20,
+        marginBottom: 15,
     },
 
     header: {
-        fontSize: 28,
+        fontSize: 25,
         fontWeight: 'bold',
     },
 
     settingsButton: {
-        backgroundColor: '#FF4F87',
+        backgroundColor: '#FFE1EB',
         padding: 10,
         borderRadius: 10,
     },
 
     settingsButtonText: {
-        color: '#FFFFFF',
+        color: '#FF4F87',
         fontWeight: 'bold',
+        fontSize: 14,
     },
 
     title: {
@@ -380,57 +431,54 @@ const styles = StyleSheet.create({
         backgroundColor: '#FFFFFF',
         padding: 20,
         borderRadius: 15,
+        elevation: 3,
         borderWidth: 1,
         borderColor: '#EEEEEE',
-        elevation: 3,
     },
 
     settingsTitle: {
         fontSize: 23,
         fontWeight: 'bold',
-        marginBottom: 8,
         color: '#333',
+        marginBottom: 10,
     },
 
     settingsDescription: {
         fontSize: 14,
         color: '#777',
-        marginBottom: 25,
+        marginBottom: 20,
     },
 
     sectionTitle: {
         fontSize: 17,
         fontWeight: 'bold',
-        marginBottom: 15,
-        color: '#FF4F87',
+        color: '#333',
+        marginBottom: 12,
     },
 
-    switchOption: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        paddingVertical: 15,
-        borderTopWidth: 1,
-        borderBottomWidth: 1,
-        borderColor: '#EEEEEE',
-        marginBottom: 25,
+    settingOption: {
+        padding: 15,
+        borderWidth: 1,
+        borderColor: '#FF4F87',
+        borderRadius: 10,
+        marginBottom: 12,
     },
 
-    switchInfo: {
-        flex: 1,
-        marginRight: 10,
+    settingSelected: {
+        backgroundColor: '#FFE1EB',
+        borderWidth: 2,
     },
 
     settingText: {
         fontSize: 16,
         fontWeight: 'bold',
         color: '#333',
+        marginBottom: 5,
     },
 
-    settingDescription: {
+    optionDescription: {
         fontSize: 13,
         color: '#777',
-        marginTop: 5,
     },
 
     applyButton: {
@@ -438,16 +486,24 @@ const styles = StyleSheet.create({
         padding: 15,
         borderRadius: 10,
         alignItems: 'center',
+        marginTop: 15,
+    },
+
+    applyButtonText: {
+        color: '#FFFFFF',
+        fontWeight: 'bold',
+        fontSize: 16,
     },
 
     cancelButton: {
-        padding: 15,
         alignItems: 'center',
+        padding: 12,
         marginTop: 5,
     },
 
     cancelText: {
         color: '#FF4F87',
         fontWeight: 'bold',
+        fontSize: 15,
     },
 });
