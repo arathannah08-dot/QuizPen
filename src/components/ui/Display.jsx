@@ -17,7 +17,9 @@ export default function Display({
     name,
     onPress,
     onDelete,
-    onEdit
+    onEdit,
+    isFavorite,
+    onFavorite
 }) {
     const [showDetails, setShowDetails] = useState(false);
 
@@ -50,9 +52,17 @@ export default function Display({
                 {length} {name}
             </Text>
 
-            {/* Edit and Delete Buttons */}
+            {/* Favorite, Edit and Delete Buttons */}
             <View style={styles.options}>
 
+                <TouchableOpacity onPress={onFavorite}>
+                    <Ionicons
+                        size={22}
+                        name={isFavorite ? "star" : "star-outline"}
+                        color={isFavorite ? "#E5A000" : "#6C4AB6"}
+                    />
+                </TouchableOpacity>
+                
                 <TouchableOpacity onPress={onEdit}>
                     <Ionicons
                         size={20}

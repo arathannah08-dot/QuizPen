@@ -1,22 +1,43 @@
-import { useRouter } from 'expo-router';
-import { useCallback, useEffect, useState } from 'react';
-import { Alert, ScrollView, StyleSheet, Text } from 'react-native';
+import { useFocusEffect, useRouter } from 'expo-router';
+import { useCallback, useState } from 'react';
+import { Alert, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import Display from '../../components/ui/Display';
 import SearchInput from '../../components/ui/SearchInput';
+import { Favorite, getFavoriteIds } from '../../storage/favorites';
 import { deleteQuiz, getQuiz } from '../../storage/quiz';
 
 export default function Quizzes() {
     const router = useRouter();
     const [quizzes, setQuizzes] = useState([]);
+    const [favoriteIds, setFavoriteIds] = useState([]);
+    const [selectedFilter, setSelectedFilter] = useState('All');
 
-    useEffect(() => {
-        const loadQuizzes = async () => {
-            const data = await getQuiz();
-            setQuizzes(data || []);
-        };
+    const loadData = useCallback(async () => {
+        const data = await getQuiz();
+        const favorites = await getFavoriteIds('quiz');
 
-        loadQuizzes();
+        setQuizzes(data || []);
+        setFavoriteIds(favorites || []);
     }, []);
+
+    useFocusEffect(
+        useCallback(() => {
+            loadData();
+        }, [loadData])
+    );
+
+    const handleFavorite = async (itemId) => {
+        const success = await Favorite('quiz', itemId);
+
+        if (success) {
+            const favorites = await getFavoriteIds('quiz');
+            setFavoriteIds(favorites);
+        }   
+    };
+
+    const displayQuizzes = selectedFilter === 'Favorites'
+        ? quizzes.filter(item => favoriteIds.includes(item.id))
+        : quizzes;
 
     return (
         <ScrollView
@@ -29,20 +50,52 @@ export default function Quizzes() {
 
             <SearchInput type="Search quiz ..." />
 
-            {quizzes.map((item, index) => (
+
+            <View style={styles.filterContainer}>
+            {['All', 'Favorites'].map((filter) => (
+                <TouchableOpacity
+                    key={filter}                    
+                    style={[
+                        styles.filterButton,
+                        selectedFilter === filter && styles.activeFilter
+                    ]}
+                    onPress={() => setSelectedFilter(filter)}
+                >
+                    <Text
+                        style={[  
+                            styles.filterText,
+                            selectedFilter === filter && styles.activeFilterText
+                        ]}
+                    >   
+                        {filter}
+                    </Text>
+                </TouchableOpacity>
+            ))}
+            </View>
+            
+            {displayQuizzes.length > 0 ? (
+                displayQuizzes.map(item => {
+                    const originalIndex = quizzes.findIndex(q => q.id === item.id); 
+
+            
+                return (
                 <Display
-                    key={index}
+                    key={item.id}
                     title={item.title}
                     desc={item.desc}
                     length={item.quiz ? item.quiz.length : 0}
                     name="Items"
 
-            onPress={() =>
-                router.push({
-                    pathname: '/screens/quizscreen/[id]',
-                    params: { id: String(index) }
-                })
-            }
+                    isFavorite={favoriteIds.includes(item.id)}
+                    
+                    onFavorite={() => handleFavorite(item.id)}
+                    
+                    onPress={() =>
+                        router.push({
+                            pathname: '/screens/quizscreen/[id]',
+                            params: { id: String(originalIndex) }
+                        })
+                    }
 
                     onDelete={async () => {
                         Alert.alert(
@@ -57,21 +110,27 @@ export default function Quizzes() {
                                 text: 'Delete',
                                 style: 'destructive',
                                 onPress: async () => {
-                                    await deleteQuiz(index);
-                                    
-                                    const data = await getQuiz();
-
-                                    setQuizzes(data || []);
+                                        await deleteQuiz(originalIndex);
+                                        await loadData();
                                 },
                             },
                         ]
                     );
                 }}    
             />
-        ))}
-    </ScrollView>
+                );
+            })
+        ) : (
+            <Text style={styles.emptyText} >
+                {selectedFilter === 'Favorites'
+                    ? 'You have no favorite quizzes yet.'
+                    : 'No quizzes found.'}
+            </Text>
+        )}
+        </ScrollView>
     );
 }
+
 
 const styles = StyleSheet.create({
     container: {
@@ -90,5 +149,39 @@ const styles = StyleSheet.create({
         color: '#e9e4f1',
         marginTop: 25,
         marginBottom: 15,
+    },
+
+        filterContainer: {
+        flexDirection: 'row',
+        gap: 10,
+        marginTop: 5,
+        marginBottom: 5,
+    },
+
+    filterButton: {
+        paddingVertical: 9,
+        paddingHorizontal: 22,
+        borderRadius: 20,
+        backgroundColor: '#6C4AB6',
+    },
+
+    activeFilter: {
+        backgroundColor: '#E9E4F1',
+    },
+
+    filterText: {
+        color: '#FFFFFF',
+        fontWeight: '600',
+    },
+
+    activeFilterText: {
+        color: '#3e0945',
+    },
+
+    emptyText: {
+        color: '#e9e4f1',
+        fontSize: 15,
+        textAlign: 'center',
+        marginTop: 35,
     },
 });
