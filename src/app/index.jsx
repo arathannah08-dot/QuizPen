@@ -1,85 +1,229 @@
+
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
-import { Alert, Text, TouchableOpacity } from 'react-native';
+import {
+  Text,
+  TouchableOpacity
+} from 'react-native';
+
 import ActButton from '../components/ui/ActButton';
 import AuthForm from '../components/ui/AuthForm';
 import UserInput from '../components/ui/UserInput';
-import { getAccountByEmail, setCurrentUser } from '../storage/account';
+
+import {
+  getAccountByEmail,
+  setCurrentUser
+} from '../storage/account';
 
 export default function HomeScreen() {
-  const router = useRouter();
+    const router = useRouter();
 
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
 
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+    const [errors, setErrors] = useState({});
+    const [touched, setTouched] = useState({});
 
+    const validateEmail = (value) => {
+        if (!value.trim()) {
+            return 'Email is required.';
+        }
 
-  return (
-    <AuthForm
-    title="QuizPen"
-    subtitle="Log in to get back to your learning journey!"
-    >
-     
-      <UserInput
-       type="Email"
-       value={email}
-       onChangeText={setEmail}
-      />
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value.trim())) {
+            return 'Please enter a valid email address.';
+        }
 
+        return '';
+    };
 
-      <UserInput
-       type="Password"
-       value={password}
-       onChangeText={setPassword}
-       isPassword
-      />
+    const validatePassword = (value) => {
+        if (!value) {
+            return 'Password is required.';
+        }
 
+        return '';
+    };
 
-      <TouchableOpacity>
-        <Text>Forgot Password?</Text>
-      </TouchableOpacity>
+    const handleEmailChange = (value) => {
+        setEmail(value);
 
+        if (touched.email) {
+            setErrors(prev => ({
+                ...prev,
+                email: validateEmail(value)
+            }));
+        }
 
-      <ActButton
-      name="Login"
-      onPress={async () => {
-        const trimmedEmail = email.trim();
+        // Clear old account errors when email changes
+        setErrors(prev => ({
+            ...prev,
+            email: validateEmail(value)
+        }));
+    };
 
-    if (trimmedEmail === '' || password === '') {
-      Alert.alert('Please fill in all fields.');
-      return;
-    }
+    const handlePasswordChange = (value) => {
+        setPassword(value);
 
-    const account = await getAccountByEmail(trimmedEmail);
+        if (touched.password) {
+            setErrors(prev => ({
+                ...prev,
+                password: validatePassword(value)
+            }));
+        }
+    };
 
-    console.log('Saved account:', account);
-    console.log('Login email:', trimmedEmail);
-    console.log('Login password:', password);
+    const checkAccount = async () => {
+        const emailError = validateEmail(email);
 
-    if (
-      account &&
-      account.email === trimmedEmail &&
-      account.password === password
-    ) {
+        if (emailError) {
+            setErrors(prev => ({
+                ...prev,
+                email: emailError
+            }));
+            return null;
+        }
 
-      await setCurrentUser(account.id);
+        const account = await getAccountByEmail(email.trim());
 
-      router.push('/home');
-    } else {
-      Alert.alert('Invalid email or password');
-    }
-  }}
-/>
+        if (!account) {
+            setErrors(prev => ({
+                ...prev,
+                email: 'Account does not exist. Please sign up first.'
+            }));
 
+            return null;
+        }
 
-      <Text>Don't have an account yet?</Text>
+        setErrors(prev => ({
+            ...prev,
+            email: ''
+        }));
 
-      <ActButton
-        name="Sign Up" variant="outline"
-        onPress={() => router.push('/register')}
-       />
-  </AuthForm>
+        return account;
+    };
 
+    const checkPassword = async () => {
+        if (!password) {
+            setErrors(prev => ({
+                ...prev,
+                password: 'Password is required.'
+            }));
+            return;
+        }
 
-  );
+        const account = await checkAccount();
+
+        if (!account) return;
+
+        if (account.password !== password) {
+            setErrors(prev => ({
+                ...prev,
+                password: 'Incorrect password.'
+            }));
+        } else {
+            setErrors(prev => ({
+                ...prev,
+                password: ''
+            }));
+        }
+    };
+
+    const handleLogin = async () => {
+        setTouched({
+            email: true,
+            password: true
+        });
+
+        const emailError = validateEmail(email);
+        const passwordError = validatePassword(password);
+
+        if (emailError || passwordError) {
+            setErrors({
+                email: emailError,
+                password: passwordError
+            });
+            return;
+        }
+
+        try {
+            const account = await getAccountByEmail(email.trim());
+
+            if (!account) {
+                setErrors({
+                    email: 'Account does not exist. Please sign up first.',
+                    password: ''
+                });
+                return;
+            }
+
+            if (account.password !== password) {
+                setErrors({
+                    email: '',
+                    password: 'Incorrect password.'
+                });
+                return;
+            }
+
+            await setCurrentUser(account.id);
+
+            router.replace('/home');
+
+        } catch (error) {
+            console.log('Login error:', error);
+
+            setErrors({
+                email: 'Unable to verify account. Please try again.',
+                password: ''
+            });
+        }
+    };
+
+    return (
+        <AuthForm
+            title="QuizPen"
+            subtitle="Log in to get back to your learning journey!"
+        >
+
+            <UserInput
+                type="Email"
+                value={email}
+                onChangeText={handleEmailChange}
+                error={touched.email ? errors.email : ''}
+                onBlur={() => {
+                    setTouched(prev => ({ ...prev, email: true }));
+                    checkAccount();
+                }}
+            />
+
+            <UserInput
+                type="Password"
+                value={password}
+                onChangeText={handlePasswordChange}
+                isPassword={true}
+                error={touched.password ? errors.password : ''}
+                onBlur={() => {
+                    setTouched(prev => ({ ...prev, password: true }));
+                    checkPassword();
+                }}
+            />
+
+            <TouchableOpacity>
+                <Text>Forgot Password?</Text>
+            </TouchableOpacity>
+
+            <ActButton
+                name="Login"
+                onPress={handleLogin}
+            />
+
+            <Text>Don't have an account yet?</Text>
+
+            <ActButton
+                name="Sign Up"
+                variant="outline"
+                onPress={() => router.push('/register')}
+            />
+
+        </AuthForm>
+    );
 }

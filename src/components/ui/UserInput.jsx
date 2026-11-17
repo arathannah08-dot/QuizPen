@@ -1,7 +1,9 @@
+
 import { Ionicons } from '@expo/vector-icons';
 import { useState } from 'react';
 import {
     StyleSheet,
+    Text,
     TextInput,
     TouchableOpacity,
     View
@@ -11,42 +13,63 @@ export default function UserInput({
     type,
     value,
     onChangeText,
-    isPassword = false
+    isPassword = false,
+    error,
+    onBlur
 }) {
     const [showPassword, setShowPassword] = useState(false);
 
     return (
         <View style={styles.inputContainer}>
 
-            <TextInput
-                placeholder={type}
-                placeholderTextColor="#9B94A8"
-                value={value}
-                onChangeText={onChangeText}
-                secureTextEntry={isPassword && !showPassword}
-                style={styles.inputBox}
-            />
+            <View style={styles.inputWrapper}>
+                <TextInput
+                    placeholder={type}
+                    placeholderTextColor="#9B94A8"
+                    value={value}
+                    onChangeText={onChangeText}
+                    onBlur={onBlur}
+                    secureTextEntry={isPassword && !showPassword}
+                    autoCapitalize="none"
+                    keyboardType={
+                        type.toLowerCase().includes('email')
+                            ? 'email-address'
+                            : 'default'
+                    }
+                    style={[
+                        styles.inputBox,
+                        error && styles.inputError
+                    ]}
+                />
 
-            {isPassword && (
-                <TouchableOpacity
-                    style={styles.eyeIcon}
-                    onPress={() => setShowPassword(!showPassword)}
-                >
-                    <Ionicons
-                        name={showPassword ? 'eye-off' : 'eye'}
-                        size={20}
-                        color="#6C4AB6"
-                    />
-                </TouchableOpacity>
-            )}
+                {isPassword && (
+                    <TouchableOpacity
+                        style={styles.eyeIcon}
+                        onPress={() => setShowPassword(!showPassword)}
+                    >
+                        <Ionicons
+                            name={showPassword ? 'eye-off' : 'eye'}
+                            size={20}
+                            color="#6C4AB6"
+                        />
+                    </TouchableOpacity>
+                )}
+            </View>
+
+            {error ? (
+                <Text style={styles.errorText}>{error}</Text>
+            ) : null}
 
         </View>
     );
 }
 
 const styles = StyleSheet.create({
-
     inputContainer: {
+        width: '100%',
+    },
+
+    inputWrapper: {
         position: 'relative',
     },
 
@@ -67,6 +90,10 @@ const styles = StyleSheet.create({
         marginTop: 12,
     },
 
+    inputError: {
+        borderColor: '#E53935',
+    },
+
     eyeIcon: {
         position: 'absolute',
         right: 12,
@@ -75,4 +102,10 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
     },
 
+    errorText: {
+        color: '#E53935',
+        fontSize: 12,
+        marginTop: 5,
+        marginLeft: 4,
+    },
 });
