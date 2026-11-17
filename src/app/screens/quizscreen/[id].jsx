@@ -10,11 +10,11 @@ import {
   View
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { getQuiz } from '../../../storage/quiz';
+import { getQuiz, saveQuizResult } from '../../../storage/quiz';
 
 const TIMER_DURATION = 15;
 
-// Shuffle array
+// Shuffle choices randomly
 const shuffleArray = (array) => {
   const shuffled = [...array];
 
@@ -30,23 +30,29 @@ const shuffleArray = (array) => {
   return shuffled;
 };
 
-// Generate multiple choices
+// Automatically generate multiple choices
 const generateChoices = (quiz, shuffleChoices) => {
   return quiz.map((item, index) => {
 
+    // Get answers from OTHER questions only
     const wrongAnswers = quiz
-      .filter((otherItem, otherIndex) => otherIndex !== index)
+      .filter((otherItem, otherIndex) =>
+        otherIndex !== index
+      )
       .map(otherItem => otherItem.answer);
 
-    const selectedWrongAnswers = shuffleArray(
-      wrongAnswers
-    ).slice(0, 3);
+    // Select 3 incorrect answers
+    const randomWrongAnswers = shuffleChoices
+      ? shuffleArray(wrongAnswers).slice(0, 3)
+      : wrongAnswers.slice(0, 3);
 
+    // Combine correct and incorrect answers
     const choices = [
       item.answer,
-      ...selectedWrongAnswers
+      ...randomWrongAnswers
     ];
 
+    // Shuffle choices if enabled
     const finalChoices = shuffleChoices
       ? shuffleArray(choices)
       : choices;
@@ -75,12 +81,13 @@ export default function QuizScreen() {
 
   // Settings
   const [showSettings, setShowSettings] = useState(false);
-  const [questionOrder, setQuestionOrder] = useState('chronological');
+  const [shuffleQuestions, setShuffleQuestions] = useState(false);
   const [shuffleChoices, setShuffleChoices] = useState(true);
   const [timerEnabled, setTimerEnabled] = useState(false);
 
   // Timer
   const [secondsLeft, setSecondsLeft] = useState(TIMER_DURATION);
+  const [timedOut, setTimedOut] = useState(false);
 
   // Load quiz
   useEffect(() => {
@@ -90,6 +97,8 @@ export default function QuizScreen() {
         const savedQuiz = data[Number(id)];
 
         if (savedQuiz && savedQuiz.quiz) {
+
+          // Generate choices automatically
           const generatedQuiz = generateChoices(
             savedQuiz.quiz,
             true
@@ -98,9 +107,9 @@ export default function QuizScreen() {
           setQuizData({
             ...savedQuiz,
             sourceQuiz: savedQuiz.quiz,
-            originalQuiz: generatedQuiz,
             quiz: generatedQuiz
           });
+
         } else {
           console.log('Quiz not found.');
         }
@@ -126,6 +135,7 @@ export default function QuizScreen() {
     }
 
     if (secondsLeft <= 0) {
+      setTimedOut(true);
       setAnswered(true);
       return;
     }
@@ -149,34 +159,35 @@ export default function QuizScreen() {
   const applySettings = () => {
     if (!quizData) return;
 
+    // Generate choices based on preferences
     const generatedQuiz = generateChoices(
       quizData.sourceQuiz,
       shuffleChoices
     );
 
-    const orderedQuiz =
-      questionOrder === 'shuffle'
-        ? shuffleArray(generatedQuiz)
-        : [...generatedQuiz];
+    // Shuffle questions if enabled
+    const orderedQuiz = shuffleQuestions
+      ? shuffleArray(generatedQuiz)
+      : [...generatedQuiz];
 
     setQuizData({
       ...quizData,
-      originalQuiz: generatedQuiz,
       quiz: orderedQuiz
     });
 
-    // Reset quiz
+    // Reset quiz progress
     setCurrent(0);
     setSelected(null);
     setScore(0);
     setAnswered(false);
     setFinished(false);
+    setTimedOut(false);
     setSecondsLeft(TIMER_DURATION);
 
     setShowSettings(false);
   };
 
-  // Check answer
+  // Check selected answer
   const checkAnswer = () => {
     if (selected === null || answered) return;
 
@@ -187,14 +198,26 @@ export default function QuizScreen() {
     setAnswered(true);
   };
 
-  // Next question
-  const nextQuestion = () => {
+  // Go to next question
+  const nextQuestion = async () => {
     if (current + 1 < quizData.quiz.length) {
       setCurrent(current + 1);
       setSelected(null);
       setAnswered(false);
+      setTimedOut(false);
       setSecondsLeft(TIMER_DURATION);
+
     } else {
+      const saved = await saveQuizResult(
+        quizData.id,
+        score,
+        quizData.quiz.length
+      );
+
+      if (!saved) {
+        console.log('Unable to save quiz result.');
+      }
+
       setFinished(true);
     }
   };
@@ -219,7 +242,9 @@ export default function QuizScreen() {
             style={styles.backButton}
             onPress={() => router.back()}
           >
-            <Text style={styles.backButtonText}>← Back</Text>
+            <Text style={styles.backButtonText}>
+              ← Back
+            </Text>
           </TouchableOpacity>
 
           <Text style={styles.title}>
@@ -258,7 +283,9 @@ export default function QuizScreen() {
             style={styles.backButton}
             onPress={() => router.back()}
           >
-            <Text style={styles.backButtonText}>← Back</Text>
+            <Text style={styles.backButtonText}>
+              ← Back
+            </Text>
           </TouchableOpacity>
 
           <TouchableOpacity
@@ -288,42 +315,34 @@ export default function QuizScreen() {
               Customize your quiz experience.
             </Text>
 
-            {/* Question Order */}
+            {/* Question Preferences */}
             <Text style={styles.sectionTitle}>
               Question Preferences
             </Text>
 
-            <TouchableOpacity
-              style={[
-                styles.settingOption,
-                questionOrder === 'shuffle' && styles.settingSelected
-              ]}
-              onPress={() => setQuestionOrder('shuffle')}
-            >
-              <Text style={styles.settingText}>
-                🔀 Shuffle Questions
-              </Text>
-              <Text style={styles.settingDescription}>
-                Display questions in random order.
-              </Text>
-            </TouchableOpacity>
+            <View style={styles.switchOption}>
+              <View style={styles.switchInfo}>
+                <Text style={styles.settingText}>
+                  Shuffle Questions
+                </Text>
 
-            <TouchableOpacity
-              style={[
-                styles.settingOption,
-                questionOrder === 'chronological' && styles.settingSelected
-              ]}
-              onPress={() => setQuestionOrder('chronological')}
-            >
-              <Text style={styles.settingText}>
-                🔢 Chronological Order
-              </Text>
-              <Text style={styles.settingDescription}>
-                Follow the original question order.
-              </Text>
-            </TouchableOpacity>
+                <Text style={styles.settingDescription}>
+                  Randomize the order of questions.
+                </Text>
+              </View>
 
-            {/* Shuffle Choices */}
+              <Switch
+                value={shuffleQuestions}
+                onValueChange={setShuffleQuestions}
+                trackColor={{
+                  false: '#b9a9c5',
+                  true: '#9b65bd'
+                }}
+                thumbColor="#ffffff"
+              />
+            </View>
+
+            {/* Answer Preferences */}
             <Text style={styles.sectionTitle}>
               Answer Preferences
             </Text>
@@ -333,6 +352,7 @@ export default function QuizScreen() {
                 <Text style={styles.settingText}>
                   Shuffle Choices
                 </Text>
+
                 <Text style={styles.settingDescription}>
                   Randomize multiple-choice answers.
                 </Text>
@@ -349,7 +369,7 @@ export default function QuizScreen() {
               />
             </View>
 
-            {/* Timer */}
+            {/* Time Preferences */}
             <Text style={styles.sectionTitle}>
               Time Preferences
             </Text>
@@ -359,6 +379,7 @@ export default function QuizScreen() {
                 <Text style={styles.settingText}>
                   Timer
                 </Text>
+
                 <Text style={styles.settingDescription}>
                   Enable a 15-second limit for each question.
                 </Text>
@@ -375,6 +396,7 @@ export default function QuizScreen() {
               />
             </View>
 
+            {/* Apply Settings */}
             <TouchableOpacity
               style={styles.button}
               onPress={applySettings}
@@ -384,6 +406,7 @@ export default function QuizScreen() {
               </Text>
             </TouchableOpacity>
 
+            {/* Cancel */}
             <TouchableOpacity
               style={styles.cancelButton}
               onPress={() => setShowSettings(false)}
@@ -452,9 +475,10 @@ export default function QuizScreen() {
                 );
               })}
 
+              {/* Answer Feedback */}
               {answered && (
                 <Text style={styles.feedback}>
-                  {secondsLeft === 0 && timerEnabled
+                  {timedOut
                     ? `Time's up! Correct answer: ${question.options[question.correctAnswer]}`
                     : selected === question.correctAnswer
                       ? 'Correct Answer!'
@@ -463,6 +487,7 @@ export default function QuizScreen() {
                 </Text>
               )}
 
+              {/* Check Answer / Next Question */}
               {!answered ? (
                 <TouchableOpacity
                   style={[
@@ -527,7 +552,7 @@ const styles = StyleSheet.create({
   progress: {
     color: '#e9e4f1',
     textAlign: 'center',
-    marginBottom: 10
+    marginBottom: 20
   },
 
   timer: {
@@ -675,19 +700,6 @@ const styles = StyleSheet.create({
     color: '#3e0945',
     marginTop: 12,
     marginBottom: 10
-  },
-
-  settingOption: {
-    padding: 15,
-    borderWidth: 1,
-    borderColor: '#3e0945',
-    borderRadius: 10,
-    marginBottom: 12
-  },
-
-  settingSelected: {
-    backgroundColor: '#d5c2e3',
-    borderWidth: 2
   },
 
   settingText: {
