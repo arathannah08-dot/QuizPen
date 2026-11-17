@@ -45,7 +45,7 @@ export default function About() {
           <br></br>
 
           By:
-          Arat, Bacarro, Gomez, Heras, Sabio, and Chatgpt
+          Arat, Bacarro, Gomez, Heras, and Sabio
         </Text>
       </View>
 
