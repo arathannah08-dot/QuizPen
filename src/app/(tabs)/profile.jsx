@@ -43,6 +43,9 @@ export default function Profile() {
     return (
         <SafeAreaView style={styles.container}>
             <Text style={styles.header}>My Account</Text>
+            <Text style={styles.subtitle}>
+                Manage your account and study activities
+            </Text>
 
             <View style={styles.statsBox}>
                 <View style={styles.statItem}>
@@ -50,11 +53,15 @@ export default function Profile() {
                     <Text style={styles.stat}>Flashcards</Text>
                 </View>
 
+                <View style={styles.divider} />
+
                 <View style={styles.statItem}>
                     <Text style={styles.statNumber}>{quizCount}</Text>
                     <Text style={styles.stat}>Quizzes</Text>
                 </View>
             </View>
+
+            <Text style={styles.sectionTitle}>Account Options</Text>
 
             <View style={styles.options}>
                 <ActButton2
@@ -73,10 +80,12 @@ export default function Profile() {
                 />
             </View>
 
-            <ActButton
-                name="Logout"
-                onPress={() => router.push('/')}
-            />
+            <View style={styles.logout}>
+                <ActButton
+                    name="Logout"
+                    onPress={() => router.push('/')}
+                />
+            </View>
         </SafeAreaView>
     );
 }
@@ -84,46 +93,72 @@ export default function Profile() {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#3e0945',
+        backgroundColor: '#125643',
         paddingHorizontal: 20,
     },
 
     header: {
         fontSize: 32,
         fontWeight: '800',
-        color: '#e9e4f1',
+        color: '#FFBA00',
         marginTop: 25,
-        marginBottom: 20,
+    },
+
+    subtitle: {
+        fontSize: 14,
+        color: '#ACE2B6',
+        marginTop: 5,
+        marginBottom: 25,
     },
 
     statsBox: {
         flexDirection: 'row',
+        alignItems: 'center',
         justifyContent: 'space-around',
-        backgroundColor: '#6b1376',
+        backgroundColor: '#F8F8F8',
         borderRadius: 16,
-        paddingVertical: 18,
-        borderWidth: 1,
-        borderColor: '#9c94ae',
+        paddingVertical: 22,
+        marginBottom: 30,
     },
 
     statItem: {
+        flex: 1,
         alignItems: 'center',
     },
 
     statNumber: {
-        fontSize: 24,
+        fontSize: 28,
         fontWeight: '800',
-        color: '#FFFFFF',
+        color: '#125643',
         marginBottom: 5,
     },
 
     stat: {
-        fontSize: 16,
+        fontSize: 15,
         fontWeight: '700',
-        color: '#ccc8d5',
+        color: '#125643',
+    },
+
+    divider: {
+        width: 1,
+        height: 45,
+        backgroundColor: '#ACE2B6',
+    },
+
+    sectionTitle: {
+        fontSize: 18,
+        fontWeight: 'bold',
+        color: '#F8F8F8',
+        marginBottom: 12,
     },
 
     options: {
-        marginTop: 20,
+        marginBottom: 20,
+    },
+
+    logout: {
+        flex: 1,
+        justifyContent: 'flex-end',
+        paddingBottom: 20,
     },
 });

@@ -2,14 +2,15 @@
 import { useFocusEffect, useRouter } from 'expo-router';
 import { useCallback, useState } from 'react';
 import {
-  ActivityIndicator,
-  ScrollView,
-  StyleSheet,
-  Text,
-  View,
+    ActivityIndicator,
+    ScrollView,
+    StyleSheet,
+    Text,
+    View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import BackButton from '../../components/ui/BackButton';
 import { getFlashcard } from '../../storage/flashcard';
 import { getQuiz } from '../../storage/quiz';
 
@@ -112,14 +113,12 @@ export default function Activity() {
         <SafeAreaView style={styles.container}>
             <ScrollView showsVerticalScrollIndicator={false}>
 
-                <Text
-                    style={styles.back}
-                    onPress={() => router.replace('/(tabs)/profile')}
-                >
-                    ‹ Back
-                </Text>
+                <Text style={styles.logo}>QuizPen</Text>
 
-                <Text style={styles.title}>Activity History</Text>
+                <View style={styles.titleRow}>
+                    <BackButton />
+                    <Text style={styles.title}>Activity History</Text>
+                </View>
 
                 <Text style={styles.subtitle}>
                     View the flashcard sets and quizzes you've created.
@@ -163,7 +162,7 @@ export default function Activity() {
                     {loading ? (
                         <ActivityIndicator
                             size="large"
-                            color="#e9e4f1"
+                            color="#F8F8F8"
                         />
                     ) : activities.length === 0 ? (
                         <View style={styles.emptyBox}>
@@ -177,16 +176,13 @@ export default function Activity() {
                             </Text>
                         </View>
                     ) : (
-                        activities.map((item, index) => (
+                        activities.map((item) => (
                             <View
                                 style={styles.activityCard}
                                 key={item.activityId}
                             >
                                 <View style={styles.activityHeader}>
                                     <View style={styles.typeContainer}>
-                                        <Text style={styles.activityIcon}>
-                                            {item.type === 'Quiz' ? '✎' : '✦'}
-                                        </Text>
 
                                         <Text style={styles.activityType}>
                                             {item.type} Created
@@ -228,41 +224,48 @@ export default function Activity() {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#3e0945',
-        padding: 20,
+        backgroundColor: '#125643',
+        paddingHorizontal: 20,
     },
 
-    back: {
-        color: '#c9aece',
-        fontSize: 16,
-        marginBottom: 25,
+    logo: {
+        fontSize: 36,
+        fontWeight: '800',
+        color: '#F8F8F8',
+        marginTop: 10,
+        marginBottom: 20,
+    },
+
+    titleRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 10,
+        marginBottom: 8,
     },
 
     title: {
-        color: '#e9e4f1',
+        color: '#FFBA00',
         fontSize: 28,
-        fontWeight: 'bold',
+        fontWeight: '800',
     },
 
     subtitle: {
-        color: '#ccc8d5',
+        color: '#ACE2B6',
         marginTop: 8,
         fontSize: 14,
         lineHeight: 21,
     },
 
     summaryBox: {
-        backgroundColor: '#6b1376',
-        borderRadius: 12,
+        backgroundColor: '#F8F8F8',
+        borderRadius: 15,
         padding: 18,
         marginTop: 25,
-        borderWidth: 1,
-        borderColor: '#9c94ae',
     },
 
     summaryTitle: {
-        color: '#ffffff',
-        fontSize: 16,
+        color: '#125643',
+        fontSize: 17,
         fontWeight: 'bold',
         marginBottom: 18,
     },
@@ -279,21 +282,22 @@ const styles = StyleSheet.create({
     },
 
     summaryNumber: {
-        color: '#ffffff',
+        color: '#B46617',
         fontSize: 28,
         fontWeight: 'bold',
     },
 
     summaryLabel: {
-        color: '#e0d3e5',
+        color: '#125643',
         fontSize: 13,
+        fontWeight: '600',
         marginTop: 5,
     },
 
     divider: {
         width: 1,
         height: 45,
-        backgroundColor: '#92539b',
+        backgroundColor: '#ACE2B6',
     },
 
     section: {
@@ -302,19 +306,17 @@ const styles = StyleSheet.create({
     },
 
     sectionTitle: {
-        color: '#e9e4f1',
+        color: '#F8F8F8',
         fontSize: 20,
         fontWeight: 'bold',
         marginBottom: 15,
     },
 
     activityCard: {
-        backgroundColor: '#6b1376',
-        borderRadius: 12,
+        backgroundColor: '#F8F8F8',
+        borderRadius: 15,
         padding: 16,
         marginBottom: 15,
-        borderWidth: 1,
-        borderColor: '#92539b',
     },
 
     activityHeader: {
@@ -329,25 +331,25 @@ const styles = StyleSheet.create({
     },
 
     activityIcon: {
-        color: '#e9e4f1',
+        color: '#B46617',
         fontSize: 18,
         marginRight: 8,
     },
 
     activityType: {
-        color: '#d8b9df',
+        color: '#B46617',
         fontSize: 13,
-        fontWeight: '600',
+        fontWeight: '700',
     },
 
     cardTitle: {
-        color: '#ffffff',
+        color: '#125643',
         fontSize: 18,
         fontWeight: 'bold',
     },
 
     cardDescription: {
-        color: '#e0d3e5',
+        color: '#527466',
         fontSize: 14,
         marginTop: 6,
         lineHeight: 20,
@@ -355,38 +357,38 @@ const styles = StyleSheet.create({
 
     cardDetails: {
         borderTopWidth: 1,
-        borderTopColor: '#92539b',
+        borderTopColor: '#ACE2B6',
         marginTop: 15,
         paddingTop: 12,
     },
 
     cardCount: {
-        color: '#ffffff',
+        color: '#125643',
         fontSize: 13,
-        fontWeight: '600',
+        fontWeight: '700',
     },
 
     cardDate: {
-        color: '#d8c8df',
+        color: '#527466',
         fontSize: 12,
         marginTop: 7,
     },
 
     emptyBox: {
-        backgroundColor: '#6b1376',
-        borderRadius: 12,
+        backgroundColor: '#F8F8F8',
+        borderRadius: 15,
         padding: 25,
         alignItems: 'center',
     },
 
     emptyTitle: {
-        color: '#ffffff',
+        color: '#125643',
         fontSize: 17,
         fontWeight: 'bold',
     },
 
     emptyText: {
-        color: '#d8c8df',
+        color: '#527466',
         fontSize: 14,
         textAlign: 'center',
         marginTop: 8,

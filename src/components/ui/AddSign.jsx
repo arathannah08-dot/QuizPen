@@ -1,5 +1,5 @@
-import Ionicons from '@expo/vector-icons/Ionicons';
 
+import Ionicons from '@expo/vector-icons/Ionicons';
 import { StyleSheet, TouchableOpacity } from 'react-native';
 
 export default function AddSign({
@@ -28,7 +28,6 @@ const styles = StyleSheet.create({
         width: 48,
         height: 48,
         borderRadius: 24,
-        backgroundColor: '#4d1147',
         alignItems: 'center',
         justifyContent: 'center',
 

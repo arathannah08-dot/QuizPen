@@ -1,10 +1,20 @@
+
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
-import { Alert, KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, View } from 'react-native';
+import {
+  Alert,
+  KeyboardAvoidingView,
+  Platform,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View
+} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import ActButton from '../../components/ui/ActButton';
 import Add from '../../components/ui/Add';
 import AddSign from '../../components/ui/AddSign';
+import BackButton from '../../components/ui/BackButton';
 import UserInput from '../../components/ui/UserInput';
 import { saveFlashcard } from '../../storage/flashcard';
 
@@ -96,75 +106,77 @@ export default function CreateFlash() {
       >
         <ScrollView
           style={styles.container}
+          contentContainerStyle={styles.content}
           keyboardShouldPersistTaps="handled"
           keyboardDismissMode="on-drag"
         >
+          <Text style={styles.logo}>QuizPen</Text>
+
           <View style={styles.header}>
-            <AddSign
-              icon="arrow-back-outline"
-              size={30}
-              color="black"
-              onPress={() => router.push('/(tabs)/create')}
-            />
+            <BackButton/>
 
             <Text style={styles.headerTxt}>
               Create Flashcard
             </Text>
           </View>
 
-        <Text style={styles.subTxt}>Add Title</Text>
-        <UserInput
-          type="Title"
-          value={title}
-          onChangeText={setTitle}
-        />
+          <Text style={styles.subTxt}>Add Title</Text>
+          <UserInput
+            type="Title"
+            value={title}
+            onChangeText={setTitle}
+          />
 
-        <Text style={styles.subTxt}>Add Description</Text>
-        <UserInput
-          type="Description"
-          value={desc}
-          onChangeText={setDesc}
-        />
+          <Text style={styles.subTxt}>Add Description</Text>
+          <UserInput
+            type="Description"
+            value={desc}
+            onChangeText={setDesc}
+          />
 
-        {flash.map((item, index) => (
-          <View style={styles.cards} key={index}>
-            <Text style={styles.cardTitle}>
-              Flashcard {index + 1}
+          <AddSign
+            style={styles.addSign}
+            icon="add-circle"
+            size={38}
+            color="#FFBA00"
+            onPress={addFlash}
+          />
+          
+          {flash.map((item, index) => (
+            <View style={styles.cards} key={index}>
+              <Text style={styles.cardTitle}>
+                Flashcard {index + 1}
+              </Text>
+
+              <Text style={styles.subTxt}>Description</Text>
+              <Add
+                add="Enter description or question"
+                value={item.description}
+                onChangeText={(text) =>
+                  updateFlash(index, 'description', text)
+                }
+              />
+
+              <Text style={styles.subTxt}>Answer</Text>
+              <Add
+                add="Enter answer"
+                value={item.answer}
+                onChangeText={(text) =>
+                  updateFlash(index, 'answer', text)
+                }
+              />
+            </View>
+          ))}
+
+          <Pressable
+            style={styles.saveButton}
+            onPress={handleSave}
+          >
+            <Text style={styles.saveButtonText}>
+              Save Flashcard Set
             </Text>
-
-            <Text style={styles.subTxt}>Description</Text>
-            <Add
-              add="Enter description or question"
-              value={item.description}
-              onChangeText={(text) =>
-                updateFlash(index, 'description', text)
-              }
-            />
-
-            <Text style={styles.subTxt}>Answer</Text>
-            <Add
-              add="Enter answer"
-              value={item.answer}
-              onChangeText={(text) =>
-                updateFlash(index, 'answer', text)
-              }
-            />
-          </View>
-        ))}
-
-        <AddSign
-          style={styles.addSign}
-          icon="add-circle"
-          size={30}
-          color="darkblue"
-          onPress={addFlash}
-        />
-
-        <ActButton
-          name="Save Flashcard Set"
-          onPress={handleSave}
-        />
-      </ScrollView>
+          </Pressable>
+        </ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>
   );
@@ -172,29 +184,44 @@ export default function CreateFlash() {
 
 const styles = StyleSheet.create({
   safeArea: {
-    flex: 1
+    flex: 1,
+    backgroundColor: '#125643'
   },
 
   container: {
-    marginRight: 15,
-    marginLeft: 15
+    flex: 1,
+    paddingHorizontal: 20
+  },
+
+  content: {
+    paddingBottom: 30
+  },
+
+  logo: {
+    fontSize: 36,
+    fontWeight: '800',
+    color: '#F8F8F8',
+    marginTop: 10,
+    marginBottom: 20
   },
 
   header: {
     flexDirection: 'row',
-    alignItems: 'baseline',
-    marginBottom: 12,
-    gap: 5
+    alignItems: 'center',
+    gap: 8,
+    marginBottom: 15
   },
 
   headerTxt: {
-    fontSize: 30,
-    fontWeight: 'bold'
+    fontSize: 28,
+    fontWeight: 'bold',
+    color: '#FFBA00'
   },
 
   subTxt: {
     fontSize: 15,
     fontWeight: 'bold',
+    color: '#F8F8F8',
     marginTop: 10,
     marginBottom: 5
   },
@@ -202,21 +229,35 @@ const styles = StyleSheet.create({
   cardTitle: {
     fontSize: 18,
     fontWeight: 'bold',
-    marginTop: 15
+    color: '#125643',
+    marginBottom: 5
   },
 
   addSign: {
     alignSelf: 'flex-end',
-    marginTop: 15,
+    marginTop: 10,
     marginBottom: 15
   },
 
   cards: {
-    marginBottom: 20,
+    marginTop: 15,
+    marginBottom: 10,
     padding: 15,
-    backgroundColor: '#F8F5FC',
-    borderWidth: 1,
-    borderColor: '#E5DCEF',
+    backgroundColor: '#F8F8F8',
     borderRadius: 15
+  },
+
+  saveButton: {
+    backgroundColor: '#FFBA00',
+    paddingVertical: 15,
+    borderRadius: 12,
+    alignItems: 'center',
+    marginTop: 5
+  },
+
+  saveButtonText: {
+    color: '#125643',
+    fontSize: 16,
+    fontWeight: 'bold'
   }
 });

@@ -168,4 +168,57 @@ export const getQuizResults = async () => {
         console.log('Error getting quiz results:', error);
         return [];
     }
+    
 };
+
+
+// update a quiz belonging to the current user
+export const updateQuiz = async (index, updatedQuiz) => {
+    try {
+        const currentUser = await getCurrentUser();
+
+        if (!currentUser) {
+            return false;
+        }
+
+        const data = await AsyncStorage.getItem('quizzes');
+        const quizzes = data ? JSON.parse(data) : [];
+
+        const userQuizzes = quizzes.filter(
+            item => item.userId === currentUser.id
+        );
+
+        const target = userQuizzes[index];
+
+        if (!target) {
+            return false;
+        }
+
+        const actualIndex = quizzes.findIndex(
+            item => item.id === target.id &&
+                    item.userId === currentUser.id
+        );
+
+        if (actualIndex === -1) {
+            return false;
+        }
+
+        quizzes[actualIndex] = {
+            ...updatedQuiz,
+            id: target.id,
+            userId: currentUser.id
+        };
+
+        await AsyncStorage.setItem(
+            'quizzes',
+            JSON.stringify(quizzes)
+        );
+
+        return true;
+
+    } catch (error) {
+        console.log('Error updating quiz:', error);
+        return false;
+    }
+};
+

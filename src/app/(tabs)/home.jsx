@@ -1,14 +1,15 @@
+
 import { useFocusEffect, useRouter } from 'expo-router';
 import { useCallback, useState } from 'react';
 import {
     ScrollView,
     StyleSheet,
-    Text
+    Text, View
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import Display from '../../components/ui/Display';
-import UserInput from '../../components/ui/UserInput';
+import SearchInput from '../../components/ui/SearchInput';
 
 import { Favorite, getFavoriteIds } from '../../storage/favorites';
 import { getFlashcard } from '../../storage/flashcard';
@@ -19,7 +20,7 @@ export default function Home() {
 
     const [flashcards, setFlashcards] = useState([]);
     const [quizzes, setQuizzes] = useState([]);
-
+    const [search, setSearch] = useState('');
     const [favoriteFlashcards, setFavoriteFlashcards] = useState([]);
     const [favoriteQuizzes, setFavoriteQuizzes] = useState([]);
 
@@ -56,13 +57,13 @@ export default function Home() {
             }
         }
     };
-        
 
     return (
         <SafeAreaView style={styles.container}>
 
             <ScrollView
                 contentContainerStyle={styles.content}
+                showsVerticalScrollIndicator={false}
             >
 
                 {/* Header */}
@@ -70,17 +71,23 @@ export default function Home() {
                     QuizPen
                 </Text>
 
-                <Text style={styles.welcome}>
-                    Ready to study?
-                </Text>
-
                 {/* Search */}
-                <UserInput type="Search ..." />
+                <SearchInput
+                    type="Search flashcards and quizzes..."
+                    value={search}
+                    onChangeText={setSearch}
+                />
 
                 {/* Continue Studying */}
-                <Text style={styles.sectionTitle}>
-                    Continue Studying
-                </Text>
+                <View style={styles.headingContainer}>
+                    <Text style={styles.welcome}>
+                        Continue where you left off
+                    </Text>
+
+                    <Text style={styles.subtitle}>
+                        Check out your recent flashcards and quizzes
+                    </Text>
+                </View>
 
                 {/* Recent Flashcards */}
                 <Text style={styles.sectionTitle}>
@@ -126,7 +133,7 @@ export default function Home() {
 
                             isFavorite={favoriteQuizzes.includes(item.id)}
                             onFavorite={() => handleFavorite('quiz', item.id)}
-                            
+
                             onPress={() =>
                                 router.push({
                                     pathname: '/screens/quizscreen/[id]',
@@ -146,34 +153,46 @@ const styles = StyleSheet.create({
 
     container: {
         flex: 1,
-        backgroundColor: '#3e0945',
+        backgroundColor: '#125643',
     },
 
     content: {
         paddingHorizontal: 20,
+        paddingTop: 15,
         paddingBottom: 30,
     },
 
     logo: {
-        fontSize: 32,
+        fontSize: 36,
         fontWeight: '800',
-        color: '#a997ce',
-        marginTop: 20,
+        color: '#F8F8F8',
+        marginTop: 10,
+        marginBottom: 12,
     },
 
     welcome: {
-        fontSize: 18,
-        color: '#e9e4f1',
-        marginTop: 4,
-        marginBottom: 10,
+        fontSize: 24,
+        fontWeight: '800',
+        color: '#F8F8F8',
+        marginBottom: 5
+    },
+
+    subtitle: {
+        fontSize: 14,
+        color: '#ACE2B6',
+        marginBottom: 8,
     },
 
     sectionTitle: {
-        fontSize: 20,
+        fontSize: 24,
         fontWeight: '700',
-        color: '#e9e4f1',
-        marginTop: 25,
+        color: '#F8F8F8',
+        marginTop: 22,
         marginBottom: 10,
+    },
+
+    headingContainer: {
+    marginTop: 24,
     },
 
 });
