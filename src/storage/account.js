@@ -130,44 +130,73 @@ export const logoutAccount = async () => {
 };
 
 
-// update the password of the currently logged-in account
+// Change password of currently logged-in account
 export const changePassword = async (currentPassword, newPassword) => {
-  try {
-    const currentUser = await getCurrentUser();
+    try {
+        const currentUser = await getCurrentUser();
 
-    if (!currentUser) {
-      return false;
+        if (!currentUser) {
+            return false;
+        }
+
+        if (currentUser.password !== currentPassword) {
+            return false;
+        }
+
+        const accounts = await getAccounts();
+
+        const accountIndex = accounts.findIndex(
+            item => item.id === currentUser.id
+        );
+
+        if (accountIndex === -1) {
+            return false;
+        }
+
+        accounts[accountIndex].password = newPassword;
+
+        await AsyncStorage.setItem(
+            'accounts',
+            JSON.stringify(accounts)
+        );
+
+        return true;
+
+    } catch (error) {
+        console.log('Error changing password:', error);
+        return false;
     }
-
-    // check if the current password is correct
-    if (currentUser.password !== currentPassword) {
-      return false;
-    }
-
-    const accounts = await getAccounts();
-
-    // find the currently logged-in account
-    const accountIndex = accounts.findIndex(
-      item => item.id === currentUser.id
-    );
-
-    if (accountIndex === -1) {
-      return false;
-    }
-
-    // update only that account's password
-    accounts[accountIndex].password = newPassword;
-
-    await AsyncStorage.setItem(
-      'accounts',
-      JSON.stringify(accounts)
-    );
-
-    return true;
-
-  } catch (error) {
-    console.log('Error changing password:', error);
-    return false;
-  }
 };
 
+
+// Reset password using registered email
+export const resetPasswordByEmail = async (email, newPassword) => {
+    try {
+        const accounts = await getAccounts();
+
+        const accountIndex = accounts.findIndex(
+            item =>
+                item.email.toLowerCase() ===
+                email.trim().toLowerCase()
+        );
+
+        // Check if account exists
+        if (accountIndex === -1) {
+            return false;
+        }
+
+        // Update password
+        accounts[accountIndex].password = newPassword;
+
+        await AsyncStorage.setItem(
+            'accounts',
+            JSON.stringify(accounts)
+        );
+
+        return true;
+
+    } catch (error) {
+        console.log('Error resetting password:', error);
+        return false;
+    }
+};
