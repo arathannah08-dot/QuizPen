@@ -2,6 +2,7 @@
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
 import {
+  Image,
   ScrollView,
   StyleSheet,
   Switch,
@@ -59,6 +60,7 @@ const generateChoices = (quiz, shuffleChoices) => {
 
     return {
       question: item.question,
+      imageUrl: item.imageUrl || item.imageUri,
       options: finalChoices,
       correctAnswer: finalChoices.findIndex(
         answer =>
@@ -441,6 +443,14 @@ export default function QuizScreen() {
                 {question.question}
               </Text>
 
+              {/*Display attached image */}
+              {question.imageUrl && (
+                <Image
+                  source={{ uri: question.imageUrl }}
+                  style={styles.questionImage}
+                />
+              )}
+
               {question.options.map((option, index) => {
 
                 const isCorrect =
@@ -740,5 +750,13 @@ const styles = StyleSheet.create({
     color: '#3e0945',
     fontWeight: 'bold',
     fontSize: 15
-  }
+  },
+
+  questionImage: {
+  width: '100%',
+  height: 180,
+  resizeMode: 'contain',
+  marginBottom: 20,
+  borderRadius: 10
+},
 });
