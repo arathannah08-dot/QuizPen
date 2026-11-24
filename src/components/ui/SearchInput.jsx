@@ -8,7 +8,7 @@ export default function SearchInput ({type, value, onChangeText}) {
              style={styles.icon}
              name="search" 
              size={20} 
-             color="#6C4AB6" 
+             color="#808080" 
             />
 
             <TextInput 

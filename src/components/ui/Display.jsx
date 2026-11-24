@@ -1,3 +1,4 @@
+
 import Ionicons from '@expo/vector-icons/Ionicons';
 
 import { useState } from 'react';
@@ -23,34 +24,62 @@ export default function Display({
 }) {
     const [showDetails, setShowDetails] = useState(false);
 
+    // Default icons depending on item type
+    const isFlashcard = name === 'Cards';
+
+    const itemIcon = isFlashcard
+        ? 'albums-outline'
+        : 'calculator-outline';
+
+    const iconBackground = isFlashcard
+        ? '#B46617'
+        : '#FFBA00';
 
     return (
-        <TouchableOpacity
-            style={styles.box}
-            onPress={onPress}
-        >
+        <View style={styles.box}>
 
-            {/* Title and Details Icon */}
-            <View style={styles.detail}>
-                <Text style={styles.title}>
-                    {title}
-                </Text>
+            {/* Card Icon and Information */}
+            <View style={styles.cardContent}>
 
-                <TouchableOpacity
-                    onPress={() => setShowDetails(true)}
-                >
+                {/* Default Icon */}
+                <View style={[
+                    styles.iconBox,
+                    { backgroundColor: iconBackground }
+                ]}>
                     <Ionicons
-                        size={20}
-                        name="alert-circle-outline"
-                        color="#6C4AB6"
+                        size={34}
+                        name={itemIcon}
+                        color="#FFFFFF"
                     />
-                </TouchableOpacity>
-            </View>
+                </View>
 
-            {/* Card Count */}
-            <Text style={styles.cardInfo}>
-                {length} {name}
-            </Text>
+                {/* Title and Details */}
+                <View style={styles.cardDetails}>
+
+                    <View style={styles.detail}>
+                        <Text style={styles.title}>
+                            {title}
+                        </Text>
+
+                        <TouchableOpacity
+                            onPress={() => setShowDetails(true)}
+                        >
+                            <Ionicons
+                                size={19}
+                                name="information-circle-outline"
+                                color="#125643"
+                            />
+                        </TouchableOpacity>
+                    </View>
+
+                    {/* Card Count */}
+                    <Text style={styles.cardInfo}>
+                        {length} {name}
+                    </Text>
+
+                </View>
+
+            </View>
 
             {/* Favorite, Edit and Delete Buttons */}
             <View style={styles.options}>
@@ -59,15 +88,15 @@ export default function Display({
                     <Ionicons
                         size={22}
                         name={isFavorite ? "star" : "star-outline"}
-                        color={isFavorite ? "#E5A000" : "#6C4AB6"}
+                        color={isFavorite ? "#FFBA00" : "#125643"}
                     />
                 </TouchableOpacity>
-                
+
                 <TouchableOpacity onPress={onEdit}>
                     <Ionicons
                         size={20}
                         name="create-outline"
-                        color="#6C4AB6"
+                        color="#125643"
                     />
                 </TouchableOpacity>
 
@@ -75,7 +104,7 @@ export default function Display({
                     <Ionicons
                         size={20}
                         name="trash-outline"
-                        color="#6C4AB6"
+                        color="#B46617"
                     />
                 </TouchableOpacity>
 
@@ -117,21 +146,21 @@ export default function Display({
                 </View>
             </Modal>
 
-        </TouchableOpacity>
+        </View>
     );
 }
 
 const styles = StyleSheet.create({
 
     box: {
-        padding: 16,
+        padding: 14,
         marginTop: 12,
-        borderColor: '#E1D9EF',
+        borderColor: '#E5E5E5',
         borderRadius: 16,
         borderWidth: 1,
-        backgroundColor: '#FFFFFF',
+        backgroundColor: '#F8F8F8',
 
-        shadowColor: '#6C4AB6',
+        shadowColor: '#125643',
         shadowOffset: {
             width: 0,
             height: 3,
@@ -139,6 +168,25 @@ const styles = StyleSheet.create({
         shadowOpacity: 0.08,
         shadowRadius: 6,
         elevation: 2,
+    },
+
+    cardContent: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 12,
+    },
+
+    iconBox: {
+        width: 58,
+        height: 58,
+        borderRadius: 12,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+
+    cardDetails: {
+        flex: 1,
+        justifyContent: 'center',
     },
 
     detail: {
@@ -149,17 +197,16 @@ const styles = StyleSheet.create({
 
     title: {
         flex: 1,
-        fontSize: 18,
+        fontSize: 16,
         fontWeight: '700',
-        color: '#292333',
-        marginBottom: 5,
-        marginRight: 10,
+        color: '#125643',
+        marginRight: 8,
     },
 
     cardInfo: {
         color: '#817B8D',
         fontSize: 14,
-        marginTop: 2,
+        marginTop: 5,
     },
 
     options: {
@@ -167,12 +214,12 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'flex-end',
         alignItems: 'center',
-        gap: 15,
+        gap: 18,
     },
 
     modalBackground: {
         flex: 1,
-        backgroundColor: 'rgba(41, 35, 51, 0.45)',
+        backgroundColor: 'rgba(18, 86, 67, 0.55)',
         justifyContent: 'center',
         alignItems: 'center',
     },
@@ -181,9 +228,9 @@ const styles = StyleSheet.create({
         width: '88%',
         padding: 22,
         borderRadius: 18,
-        backgroundColor: '#FFFFFF',
+        backgroundColor: '#F8F8F8',
 
-        shadowColor: '#6C4AB6',
+        shadowColor: '#125643',
         shadowOffset: {
             width: 0,
             height: 4,
@@ -196,7 +243,7 @@ const styles = StyleSheet.create({
     modalTitle: {
         fontSize: 22,
         fontWeight: '800',
-        color: '#292333',
+        color: '#125643',
         marginBottom: 10,
     },
 
@@ -209,14 +256,14 @@ const styles = StyleSheet.create({
 
     modalLength: {
         fontSize: 14,
-        color: '#6C4AB6',
+        color: '#B46617',
         fontWeight: '600',
         marginBottom: 20,
     },
 
     closeBttn: {
         alignSelf: 'flex-end',
-        backgroundColor: '#EEE8FA',
+        backgroundColor: '#ACE2B6',
         paddingHorizontal: 16,
         paddingVertical: 9,
         borderRadius: 10,
@@ -225,7 +272,7 @@ const styles = StyleSheet.create({
     closeTxt: {
         fontSize: 15,
         fontWeight: '700',
-        color: '#6C4AB6',
+        color: '#125643',
     },
 
 });

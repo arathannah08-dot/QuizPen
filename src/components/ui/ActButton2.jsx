@@ -15,14 +15,17 @@ export default function ActButton2({ name, onPress }) {
 
 const styles = StyleSheet.create({
     actBtn: {
-        padding: 10,
+        paddingVertical: 16,
+        paddingHorizontal: 15,
+        backgroundColor: '#F8F8F8',
+        borderRadius: 12,
+        marginBottom: 10,
     },
 
     actTxt: {
-        marginRight: 15,
-        color: '#6C4AB6',
+        color: '#125643',
         textAlign: 'left',
-        fontSize: 14,
-        fontWeight: '600',
+        fontSize: 16,
+        fontWeight: '700',
     },
 });

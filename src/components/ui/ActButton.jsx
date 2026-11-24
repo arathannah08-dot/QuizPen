@@ -1,17 +1,19 @@
+
 import { StyleSheet, Text, TouchableOpacity } from 'react-native';
 
-export default function ActButton ({name, variant = "filled", onPress}) {
+export default function ActButton({ name, variant = "filled", onPress }) {
     return (
-        <TouchableOpacity style={[
-            styles.filledBtn,
-            variant === "outline" && styles.outlineBtn
+        <TouchableOpacity
+            style={[
+                styles.filledBtn,
+                variant === "outline" && styles.outlineBtn
             ]}
             onPress={onPress}
         >
-            
-            <Text style={[
-                styles.buttonTxt,
-                variant === "outline" && styles.outlineTxt
+            <Text
+                style={[
+                    styles.buttonTxt,
+                    variant === "outline" && styles.outlineTxt
                 ]}
             >
                 {name}
@@ -20,31 +22,31 @@ export default function ActButton ({name, variant = "filled", onPress}) {
     );
 }
 
-const styles = StyleSheet.create ({
+const styles = StyleSheet.create({
     filledBtn: {
         width: '100%',
         paddingVertical: 14,
         borderRadius: 12,
-        backgroundColor: '#6C4AB6',
+        backgroundColor: '#FFBA00',
         marginTop: 12,
         alignItems: 'center',
     },
 
     buttonTxt: {
-         color: '#FFFFFF',
+        color: '#125643',
         fontSize: 16,
         fontWeight: '700',
         textAlign: 'center',
     },
 
     outlineBtn: {
-        backgroundColor: '#FFFFFF',
+        backgroundColor: '#F8F8F8',
         borderWidth: 1.5,
-        borderColor: '#6C4AB6',
+        borderColor: '#ACE2B6',
     },
 
     outlineTxt: {
-        color: '#6C4AB6',
+        color: '#125643',
         fontSize: 16,
         fontWeight: '700',
         textAlign: 'center',

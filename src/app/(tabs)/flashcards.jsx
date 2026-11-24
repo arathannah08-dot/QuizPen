@@ -1,3 +1,4 @@
+
 import { useFocusEffect, useRouter } from 'expo-router';
 import { useCallback, useState } from 'react';
 import {
@@ -8,6 +9,7 @@ import {
     TouchableOpacity,
     View
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 import Display from '../../components/ui/Display';
 import SearchInput from '../../components/ui/SearchInput';
@@ -26,6 +28,7 @@ export default function Flashcards() {
     const router = useRouter();
 
     const [flashcards, setFlashcards] = useState([]);
+    const [search, setSearch] = useState('');
     const [favoriteIds, setFavoriteIds] = useState([]);
     const [selectedFilter, setSelectedFilter] = useState('All');
 
@@ -41,11 +44,11 @@ export default function Flashcards() {
         useCallback(() => {
             loadData();
         }, [loadData])
-    );  
+    );
 
     const handleFavorite = async (itemId) => {
         const success = await Favorite('flashcard', itemId);
-    
+
         if (success) {
             const favorites = await getFavoriteIds('flashcard');
             setFavoriteIds(favorites);
@@ -57,105 +60,126 @@ export default function Flashcards() {
         : flashcards;
 
     return (
-        <ScrollView
-            style={styles.container}
-            contentContainerStyle={styles.content}
-        >
+        <SafeAreaView style={styles.container}>
 
-            <Text style={styles.header}>
-                Flashcards
-            </Text>
+            <ScrollView
+                contentContainerStyle={styles.content}
+                showsVerticalScrollIndicator={false}
+            >
 
-            <View>
-                <SearchInput type="Search flashcard ..." />
-            </View>
+                {/* Header */}
+                <Text style={styles.logo}>
+                    QuizPen
+                </Text>
 
-            <View style={styles.filterContainer}>
-
-                {['All', 'Favorites'].map(filter => (
-                <TouchableOpacity
-                    key={filter}
-                    style={[
-                        styles.filterButton,
-                        selectedFilter === filter && styles.activeFilter
-                    ]}
-                    onPress={() => setSelectedFilter(filter)}
-                >
-                    <Text
-                        style={[
-                            styles.filterText,
-                            selectedFilter === filter && styles.activeFilterText
-                        ]}
-                    >
-                        {filter}
-                    </Text>
-                </TouchableOpacity>
-                ))}
-            </View>
-
-            {displayFlashcards.length > 0 ? (
-                displayFlashcards.map(item => {
-                    const index = flashcards.findIndex(flashcard => flashcard.id === item.id);
-
-                    return (
-                        
-                <Display
-                    key={item.id}
-                    title={item.title}
-                    desc={item.desc}
-                    length={item.flash ? item.flash.length : 0}
-                    name="Cards"
-
-                    isFavorite={favoriteIds.includes(item.id)}
-
-                    onFavorite={() => handleFavorite(item.id)}
-
-                    onPress={() =>
-                        router.push({
-                            pathname: '/screens/flashscreen/[id]',
-                            params: { id: index }
-                        })
-                    }
-
-                    onEdit={() =>
-                        router.push({
-                            pathname: '/screens/editflash',
-                            params: { id: index }
-                        })
-                    }
-
-                    onDelete={async () => {
-                        Alert.alert(
-                            'Delete Flashcard',
-                            'Are you sure you want to delete this flashcard?',
-                            [
-                                {
-                                    text: 'Cancel',
-                                    style: 'cancel',
-                                },
-                                {
-                                    text: 'Delete',
-                                    style: 'destructive',
-                                    onPress: async () => {
-                                            await deleteFlashcard(index);
-                                            await loadData();
-                                    },
-                                },
-                            ]
-                        );
-                    }}
+                {/* Search */}
+                <SearchInput
+                    type="Search flashcards and quizzes..."
+                    value={search}
+                    onChangeText={setSearch}
                 />
-            );
-        })
-    ) : (
-            <Text style={styles.emptyText} >
-                {selectedFilter === 'Favorites'
-                    ? 'You have no favorite flashcards yet.'
-                    : 'No flashcards found.'}
-            </Text>
-        )}
 
-        </ScrollView>
+                {/* Page Title */}
+                <Text style={styles.header}>
+                    Your Flashcards
+                </Text>
+
+                <Text style={styles.subtitle}>
+                    Check out your flashcards
+                </Text>
+
+                {/* Filters */}
+                <View style={styles.filterContainer}>
+
+                    {['All', 'Favorites'].map(filter => (
+                        <TouchableOpacity
+                            key={filter}
+                            style={[
+                                styles.filterButton,
+                                selectedFilter === filter && styles.activeFilter
+                            ]}
+                            onPress={() => setSelectedFilter(filter)}
+                        >
+                            <Text
+                                style={[
+                                    styles.filterText,
+                                    selectedFilter === filter && styles.activeFilterText
+                                ]}
+                            >
+                                {filter === 'Favorites' ? 'Favorite' : filter}
+                            </Text>
+                        </TouchableOpacity>
+                    ))}
+
+                </View>
+
+                {/* Flashcard List */}
+                {displayFlashcards.length > 0 ? (
+                    displayFlashcards.map(item => {
+                        const index = flashcards.findIndex(
+                            flashcard => flashcard.id === item.id
+                        );
+
+                        return (
+                            <Display
+                                key={item.id}
+                                title={item.title}
+                                desc={item.desc}
+                                length={item.flash ? item.flash.length : 0}
+                                name="Cards"
+
+                                isFavorite={favoriteIds.includes(item.id)}
+
+                                onFavorite={() => handleFavorite(item.id)}
+
+                                onPress={() =>
+                                    router.push({
+                                        pathname: '/screens/flashscreen/[id]',
+                                        params: { id: index }
+                                    })
+                                }
+
+                                onEdit={() =>
+                                    router.push({
+                                        pathname: '/screens/editflash',
+                                        params: { id: index }
+                                    })
+                                }
+
+                                onDelete={async () => {
+                                    Alert.alert(
+                                        'Delete Flashcard',
+                                        'Are you sure you want to delete this flashcard?',
+                                        [
+                                            {
+                                                text: 'Cancel',
+                                                style: 'cancel',
+                                            },
+                                            {
+                                                text: 'Delete',
+                                                style: 'destructive',
+                                                onPress: async () => {
+                                                    await deleteFlashcard(index);
+                                                    await loadData();
+                                                },
+                                            },
+                                        ]
+                                    );
+                                }}
+                            />
+                        );
+                    })
+                ) : (
+                    <Text style={styles.emptyText}>
+                        {selectedFilter === 'Favorites'
+                            ? 'You have no favorite flashcards yet.'
+                            : 'No flashcards found.'}
+                    </Text>
+                )}
+
+            </ScrollView>
+
+        </SafeAreaView>
     );
 }
 
@@ -163,51 +187,72 @@ const styles = StyleSheet.create({
 
     container: {
         flex: 1,
-        backgroundColor: '#3e0945',
+        backgroundColor: '#125643',
     },
 
     content: {
-        paddingHorizontal: 15,
+        paddingHorizontal: 20,
+        paddingTop: 15,
         paddingBottom: 30,
     },
 
-    header: {
-        fontSize: 35,
-        fontWeight: 'bold',
-        color: '#e9e4f1',
-        marginTop: 25,
-        marginBottom: 15,
+    logo: {
+        fontSize: 36,
+        fontWeight: '800',
+        color: '#F8F8F8',
+        marginTop: 10,
+        marginBottom: 12,
     },
-    
-        filterContainer: {
-        flexDirection: 'row',
-        gap: 10,
-        marginTop: 5,
+
+    searchContainer: {
+        marginBottom: 18,
+    },
+
+    header: {
+        fontSize: 24,
+        fontWeight: '800',
+        color: '#FFBA00',
         marginBottom: 5,
     },
 
+    subtitle: {
+        fontSize: 14,
+        color: '#ACE2B6',
+        marginBottom: 18,
+    },
+
+    filterContainer: {
+        flexDirection: 'row',
+        gap: 10,
+        marginTop: 2,
+        marginBottom: 8,
+    },
+
     filterButton: {
-        paddingVertical: 9,
+        minWidth: 90,
+        alignItems: 'center',
+        paddingVertical: 8,
         paddingHorizontal: 22,
         borderRadius: 20,
-        backgroundColor: '#6C4AB6',
+        backgroundColor: '#ACE2B6',
     },
 
     activeFilter: {
-        backgroundColor: '#E9E4F1',
+        backgroundColor: '#F8F8F8',
     },
 
     filterText: {
-        color: '#FFFFFF',
-        fontWeight: '600',
+        color: '#125643',
+        fontSize: 15,
+        fontWeight: '700',
     },
 
     activeFilterText: {
-        color: '#3e0945',
+        color: '#125643',
     },
 
     emptyText: {
-        color: '#e9e4f1',
+        color: '#ACE2B6',
         fontSize: 15,
         textAlign: 'center',
         marginTop: 35,

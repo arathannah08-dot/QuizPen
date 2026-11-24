@@ -7,6 +7,7 @@ import {
   Image,
   KeyboardAvoidingView,
   Platform,
+  Pressable,
   ScrollView,
   StyleSheet,
   Text,
@@ -15,17 +16,17 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import ActButton from '../../components/ui/ActButton';
 import Add from '../../components/ui/Add';
 import AddSign from '../../components/ui/AddSign';
+import BackButton from '../../components/ui/BackButton';
 import UserInput from '../../components/ui/UserInput';
 import { saveQuiz } from '../../storage/quiz';
 
 export default function CreateQuiz() {
-  const router = useRouter();
+    const router = useRouter();
 
-  const [title, setTitle] = useState('');
-  const [desc, setDesc] = useState('');
+    const [title, setTitle] = useState('');
+    const [desc, setDesc] = useState('');
 
   const [quiz, setQuiz] = useState([
     {
@@ -45,31 +46,33 @@ export default function CreateQuiz() {
         imageUrl: null
       }
     ]);
-  };
 
-  // Update question
-  const updateQuestion = (index, text) => {
-    const updatedQuiz = [...quiz];
-
-    updatedQuiz[index] = {
-      ...updatedQuiz[index],
-      question: text
+    // Add another question
+    const addQuiz = () => {
+        setQuiz([
+            ...quiz,
+            {
+                question: '',
+                answer: ''
+            }
+        ]);
     };
 
-    setQuiz(updatedQuiz);
-  };
+    // Update question
+    const updateQuestion = (index, text) => {
+        const updatedQuiz = [...quiz];
 
-  // Update correct answer
-  const updateAnswer = (index, text) => {
-    const updatedQuiz = [...quiz];
+        updatedQuiz[index] = {
+            ...updatedQuiz[index],
+            question: text
+        };
 
-    updatedQuiz[index] = {
-      ...updatedQuiz[index],
-      answer: text
+        setQuiz(updatedQuiz);
     };
 
-    setQuiz(updatedQuiz);
-  };
+    // Update correct answer
+    const updateAnswer = (index, text) => {
+        const updatedQuiz = [...quiz];
 
   const pickImage = async (index) => {
     const result = await ImagePicker.launchImageLibraryAsync({
@@ -97,38 +100,39 @@ export default function CreateQuiz() {
       return;
     }
 
-    if (quiz.length < 4) {
-      Alert.alert(
-        'Not Enough Questions',
-        'Please add at least 4 questions.'
-      );
-      return;
-    }
+        setQuiz(updatedQuiz);
+    };
 
-    const hasEmptyQuestion = quiz.some(
-      item => !item.question.trim() || !item.answer.trim()
-    );
+    // Save quiz
+    const handleSave = async () => {
+        if (!title.trim()) {
+            Alert.alert('Missing Title', 'Please enter a quiz title.');
+            return;
+        }
 
-    if (hasEmptyQuestion) {
-      Alert.alert(
-        'Incomplete Quiz',
-        'Please complete every question and answer.'
-      );
-      return;
-    }
+        if (quiz.length < 4) {
+            Alert.alert(
+                'Not Enough Questions',
+                'Please add at least 4 questions.'
+            );
+            return;
+        }
 
-    // Check duplicate correct answers
-    const answers = quiz.map(item =>
-      item.answer.trim().toLowerCase()
-    );
+        const hasEmptyQuestion = quiz.some(
+            item => !item.question.trim() || !item.answer.trim()
+        );
 
-    if (new Set(answers).size !== answers.length) {
-      Alert.alert(
-        'Duplicate Answers',
-        'Every question must have a different correct answer.'
-      );
-      return;
-    }
+        if (hasEmptyQuestion) {
+            Alert.alert(
+                'Incomplete Quiz',
+                'Please complete every question and answer.'
+            );
+            return;
+        }
+
+        const answers = quiz.map(item =>
+            item.answer.trim().toLowerCase()
+        );
 
     try {
       const result = await saveQuiz({
@@ -281,61 +285,87 @@ export default function CreateQuiz() {
 }
 
 const styles = StyleSheet.create({
-  safe: {
-    flex: 1,
-    backgroundColor: '#fff'
-  },
+    safe: {
+        flex: 1,
+        backgroundColor: '#125643'
+    },
 
-  container: {
-    marginHorizontal: 15
-  },
+    container: {
+        marginHorizontal: 15
+    },
 
-  content: {
-    paddingBottom: 30
-  },
+    content: {
+        paddingBottom: 30
+    },
 
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 12,
-    gap: 5
-  },
+    logo: {
+        fontSize: 36,
+        fontWeight: '800',
+        color: '#F8F8F8',
+        marginTop: 15,
+        marginBottom: 20
+    },
 
-  headerTxt: {
-    fontSize: 30,
-    fontWeight: 'bold'
-  },
+    header: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginBottom: 12,
+        gap: 10
+    },
 
-  subTxt: {
-    fontSize: 15,
-    fontWeight: 'bold',
-    marginTop: 10,
-    marginBottom: 5
-  },
+    headerTxt: {
+        fontSize: 30,
+        fontWeight: 'bold',
+        color: '#FFBA00'
+    },
 
-  instruction: {
-    fontSize: 13,
-    color: '#666',
-    marginTop: 15
-  },
+    subTxt: {
+        fontSize: 15,
+        fontWeight: 'bold',
+        color: '#ACE2B6',
+        marginTop: 10,
+        marginBottom: 5
+    },
 
-  addSign: {
-    alignSelf: 'flex-end',
-    marginTop: 15
-  },
+    instruction: {
+        fontSize: 13,
+        color: '#ACE2B6',
+        marginTop: 15,
+        lineHeight: 19
+    },
 
-  cards: {
-    marginBottom: 25,
-    padding: 12,
-    backgroundColor: '#f1e8f5',
-    borderRadius: 12
-  },
+    addSign: {
+        alignSelf: 'flex-end',
+        marginTop: 15,
+        marginBottom: 10
+    },
 
-  questionTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#3e0945'
-  },
+    cards: {
+        marginBottom: 20,
+        padding: 15,
+        backgroundColor: '#F8F8F8',
+        borderRadius: 15
+    },
+
+    questionTitle: {
+        fontSize: 18,
+        fontWeight: 'bold',
+        color: '#125643'
+    },
+
+    saveButton: {
+        backgroundColor: '#FFBA00',
+        paddingVertical: 15,
+        borderRadius: 10,
+        alignItems: 'center',
+        marginTop: 10
+    },
+
+    saveButtonText: {
+        color: '#125643',
+        fontSize: 16,
+        fontWeight: 'bold'
+    },
 
   imageButton: {
   backgroundColor: '#6354B8',

@@ -9,7 +9,7 @@ import {
     View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-
+import BackButton from '../../components/ui/BackButton';
 import { getFlashcard } from '../../storage/flashcard';
 import {
     getQuiz,
@@ -85,7 +85,7 @@ export default function Performance() {
             <Text style={styles.statLabel}>{title}</Text>
 
             {loading ? (
-                <ActivityIndicator color="#ffffff" />
+                <ActivityIndicator color="#125643" />
             ) : (
                 <Text style={styles.statNumber}>{count}</Text>
             )}
@@ -98,18 +98,23 @@ export default function Performance() {
 
     return (
         <SafeAreaView style={styles.container}>
-            <ScrollView showsVerticalScrollIndicator={false}>
-                <Text
-                    style={styles.back}
-                    onPress={() => router.replace('/(tabs)/profile')}
-                >
-                    ‹ Back
-                </Text>
+            <ScrollView
+                showsVerticalScrollIndicator={false}
+                contentContainerStyle={styles.content}
+            >
+            <Text style={styles.logo}>QuizPen</Text>
 
+            <View style={styles.titleRow}>
+                <BackButton />
                 <Text style={styles.title}>Performance</Text>
+            </View>
 
-                <Text style={styles.subtitle}>
-                    Here's a quick look at your performance and progress.
+            <Text style={styles.subtitle}>
+                Here's a quick look at your performance and progress.
+            </Text>
+
+                <Text style={styles.sectionTitle}>
+                    Your Activity
                 </Text>
 
                 <View style={styles.statsContainer}>
@@ -118,35 +123,75 @@ export default function Performance() {
                         count={flashcardCount}
                         description="Flashcards created"
                     />
-                <View style={styles.infoBox}>
-                    <Text style={styles.infoTitle}>
-                        Legend:
-                    </Text>
 
-                    <Text style={styles.infoText}>
-                        80% or higher = Mastered{"\n"}
-                        Lower than 80% = Needs More Review
-                    </Text>
-                </View>
                     <StatCard
                         title="Total Quizzes"
                         count={quizCount}
                         description="Quizzes created"
                     />
-
-                    <StatCard
-                        title="Mastered"
-                        count={masteredCount}
-                        description="Quizzes with 80% or higher"
-                    />
-
-                    <StatCard
-                        title="Needs More Review"
-                        count={reviewCount}
-                        description="Quizzes below 80%"
-                    />
                 </View>
 
+                <Text style={styles.sectionTitle}>
+                    Quiz Performance
+                </Text>
+
+                <View style={styles.performanceContainer}>
+                    <View style={styles.performanceCard}>
+                        <Text style={styles.performanceLabel}>
+                            Mastered
+                        </Text>
+
+                        {loading ? (
+                            <ActivityIndicator color="#125643" />
+                        ) : (
+                            <Text style={styles.performanceNumber}>
+                                {masteredCount}
+                            </Text>
+                        )}
+
+                        <Text style={styles.performanceDescription}>
+                            Quizzes with 80% or higher
+                        </Text>
+                    </View>
+
+                    <View style={styles.reviewCard}>
+                        <Text style={styles.performanceLabel}>
+                            Needs More Review
+                        </Text>
+
+                        {loading ? (
+                            <ActivityIndicator color="#125643" />
+                        ) : (
+                            <Text style={styles.performanceNumber}>
+                                {reviewCount}
+                            </Text>
+                        )}
+
+                        <Text style={styles.performanceDescription}>
+                            Quizzes below 80%
+                        </Text>
+                    </View>
+                </View>
+
+                <View style={styles.infoBox}>
+                    <Text style={styles.infoTitle}>
+                        Performance Guide
+                    </Text>
+
+                    <View style={styles.legendItem}>
+                        <View style={styles.masteredDot} />
+                        <Text style={styles.infoText}>
+                            80% or higher – Mastered
+                        </Text>
+                    </View>
+
+                    <View style={styles.legendItem}>
+                        <View style={styles.reviewDot} />
+                        <Text style={styles.infoText}>
+                            Lower than 80% – Needs More Review
+                        </Text>
+                    </View>
+                </View>
             </ScrollView>
         </SafeAreaView>
     );
@@ -155,78 +200,166 @@ export default function Performance() {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#3e0945',
-        padding: 20,
+        backgroundColor: '#125643',
+    },
+
+    content: {
+        paddingHorizontal: 20,
+        paddingBottom: 30,
     },
 
     back: {
-        color: '#c9aece',
+        color: '#ACE2B6',
         fontSize: 16,
-        marginBottom: 25,
+        fontWeight: '600',
+        marginTop: 10,
+        marginBottom: 20,
     },
 
     title: {
-        color: '#e9e4f1',
+        color: '#FFBA00',
         fontSize: 28,
-        fontWeight: 'bold',
+        fontWeight: '800',
     },
 
     subtitle: {
-        color: '#ccc8d5',
+        color: '#ACE2B6',
         fontSize: 14,
         marginTop: 8,
         marginBottom: 25,
+        lineHeight: 20,
+    },
+
+    sectionTitle: {
+        color: '#F8F8F8',
+        fontSize: 18,
+        fontWeight: 'bold',
+        marginBottom: 12,
     },
 
     statsContainer: {
-        gap: 15,
+        flexDirection: 'row',
+        gap: 12,
+        marginBottom: 25,
     },
 
     statBox: {
-        backgroundColor: '#6b1376',
-        borderRadius: 12,
-        padding: 20,
-        borderWidth: 1,
-        borderColor: '#9c94ae',
+        flex: 1,
+        backgroundColor: '#F8F8F8',
+        borderRadius: 15,
+        padding: 15,
+        minHeight: 125,
+        justifyContent: 'center',
     },
 
     statLabel: {
-        color: '#e9e4f1',
-        fontSize: 16,
-        fontWeight: '600',
+        color: '#125643',
+        fontSize: 14,
+        fontWeight: '700',
     },
 
     statNumber: {
-        color: '#ffffff',
-        fontSize: 38,
-        fontWeight: 'bold',
+        color: '#125643',
+        fontSize: 32,
+        fontWeight: '800',
         marginTop: 10,
     },
 
     statDescription: {
-        color: '#d7c9df',
-        fontSize: 13,
+        color: '#557568',
+        fontSize: 12,
         marginTop: 5,
     },
 
-    infoBox: {
-        marginTop: 20,
-        marginBottom: 20,
+    performanceContainer: {
+        gap: 12,
+        marginBottom: 25,
+    },
+
+    performanceCard: {
+        backgroundColor: '#ACE2B6',
+        borderRadius: 15,
         padding: 18,
-        backgroundColor: '#50105a',
-        borderRadius: 12,
+    },
+
+    reviewCard: {
+        backgroundColor: '#F8F8F8',
+        borderRadius: 15,
+        padding: 18,
+    },
+
+    performanceLabel: {
+        color: '#125643',
+        fontSize: 16,
+        fontWeight: '700',
+    },
+
+    performanceNumber: {
+        color: '#125643',
+        fontSize: 36,
+        fontWeight: '800',
+        marginTop: 8,
+    },
+
+    performanceDescription: {
+        color: '#557568',
+        fontSize: 13,
+        marginTop: 4,
+    },
+
+    infoBox: {
+        backgroundColor: '#F8F8F8',
+        borderRadius: 15,
+        padding: 18,
     },
 
     infoTitle: {
-        color: '#ffffff',
+        color: '#125643',
         fontSize: 16,
-        fontWeight: '600',
+        fontWeight: '800',
+        marginBottom: 12,
+    },
+
+    legendItem: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginBottom: 8,
+    },
+
+    masteredDot: {
+        width: 10,
+        height: 10,
+        borderRadius: 5,
+        backgroundColor: '#ACE2B6',
+        marginRight: 10,
+    },
+
+    reviewDot: {
+        width: 10,
+        height: 10,
+        borderRadius: 5,
+        backgroundColor: '#B46617',
+        marginRight: 10,
     },
 
     infoText: {
-        color: '#d7c9df',
+        color: '#125643',
         fontSize: 13,
-        lineHeight: 20,
-        marginTop: 8,
+    },
+
+    logo: {
+    fontSize: 36,
+    fontWeight: '800',
+    color: '#F8F8F8',
+    marginTop: 10,
+    marginBottom: 20,
+    letterSpacing: -1,
+    },
+
+    titleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    marginBottom: 8,
     },
 });
