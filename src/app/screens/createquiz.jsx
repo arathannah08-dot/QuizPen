@@ -1,13 +1,16 @@
 
+import * as ImagePicker from 'expo-image-picker';
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import {
   Alert,
+  Image,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
   StyleSheet,
   Text,
+  TouchableOpacity,
   View
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -27,7 +30,8 @@ export default function CreateQuiz() {
   const [quiz, setQuiz] = useState([
     {
       question: '',
-      answer: ''
+      answer: '',
+      imageUrl: null
     }
   ]);
 
@@ -37,7 +41,8 @@ export default function CreateQuiz() {
       ...quiz,
       {
         question: '',
-        answer: ''
+        answer: '',
+        imageUrl: null
       }
     ]);
   };
@@ -64,6 +69,25 @@ export default function CreateQuiz() {
     };
 
     setQuiz(updatedQuiz);
+  };
+
+  const pickImage = async (index) => {
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ['images'],
+      allowsEditing: true,
+      quality: 0.7
+    });
+
+    if (!result.canceled) {
+      const updateQuiz = [...quiz];
+
+      updateQuiz[index] = {
+        ...updateQuiz[index],
+        imageUrl: result.assets[0].uri
+      };
+
+      setQuiz(updateQuiz);
+    }
   };
 
   // Save quiz
@@ -112,7 +136,8 @@ export default function CreateQuiz() {
         desc: desc.trim(),
         quiz: quiz.map(item => ({
           question: item.question.trim(),
-          answer: item.answer.trim()
+          answer: item.answer.trim(),
+          imageUrl: item.imageUrl
         }))
       });
 
@@ -211,6 +236,24 @@ export default function CreateQuiz() {
               }
             />
 
+            {/* Attach image here*/}
+            <TouchableOpacity
+              style={styles.imageButton}
+              onPress={() => pickImage(index)}
+            >
+              <Text style={styles.imageButtonText}>
+                + Attach Image
+              </Text>
+
+            </TouchableOpacity>
+
+            {item.imageUrl && (
+              <Image
+                source={{ uri: item.imageUrl }}
+                style={styles.questionImage}
+              />
+            )}
+
             <Text style={styles.subTxt}>
               Add Correct Answer
             </Text>
@@ -292,5 +335,26 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: 'bold',
     color: '#3e0945'
-  }
+  },
+
+  imageButton: {
+  backgroundColor: '#6354B8',
+  padding: 12,
+  borderRadius: 8,
+  alignItems: 'center',
+  marginTop: 12
+},
+
+imageButtonText: {
+  color: '#fff',
+  fontWeight: 'bold'
+},
+
+questionImage: {
+  width: '100%',
+  height: 180,
+  resizeMode: 'contain',
+  marginTop: 10,
+  borderRadius: 10
+}
 });
