@@ -3,12 +3,13 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
 import {
-    ScrollView,
-    StyleSheet,
-    Switch,
-    Text,
-    TouchableOpacity,
-    View
+  Image,
+  ScrollView,
+  StyleSheet,
+  Switch,
+  Text,
+  TouchableOpacity,
+  View
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -35,33 +36,41 @@ const shuffleArray = (array) => {
 
 // Automatically generate multiple choices
 const generateChoices = (quiz, shuffleChoices) => {
-    return quiz.map((item, index) => {
-        const wrongAnswers = quiz
-            .filter((otherItem, otherIndex) => otherIndex !== index)
-            .map(otherItem => otherItem.answer);
+  return quiz.map((item, index) => {
 
-        const selectedWrongAnswers = shuffleArray(
-            wrongAnswers
-        ).slice(0, 3);
+    // Get answers from OTHER questions only
+    const wrongAnswers = quiz
+      .filter((otherItem, otherIndex) =>
+        otherIndex !== index
+      )
+      .map(otherItem => otherItem.answer);
 
-        const choices = [
-            item.answer,
-            ...selectedWrongAnswers
-        ];
+    // Select 3 incorrect answers
+    const randomWrongAnswers = shuffleChoices
+      ? shuffleArray(wrongAnswers).slice(0, 3)
+      : wrongAnswers.slice(0, 3);
 
-        const finalChoices = shuffleChoices
-            ? shuffleArray(choices)
-            : choices;
+    // Combine correct and incorrect answers
+    const choices = [
+      item.answer,
+      ...randomWrongAnswers
+    ];
 
-        return {
-            question: item.question,
-            options: finalChoices,
-            correctAnswer: finalChoices.findIndex(
-                answer =>
-                    answer.toLowerCase() === item.answer.toLowerCase()
-            )
-        };
-    });
+    // Shuffle choices if enabled
+    const finalChoices = shuffleChoices
+      ? shuffleArray(choices)
+      : choices;
+
+    return {
+      question: item.question,
+      imageUrl: item.imageUrl || item.imageUri,
+      options: finalChoices,
+      correctAnswer: finalChoices.findIndex(
+        answer =>
+          answer.toLowerCase() === item.answer.toLowerCase()
+      )
+    };
+  });
 };
 
 export default function QuizScreen() {
@@ -261,8 +270,97 @@ export default function QuizScreen() {
                 contentContainerStyle={styles.content}
                 keyboardShouldPersistTaps="handled"
             >
-                <Text style={styles.logo}>
-                    QuizPen
+              <Text style={styles.buttonText}>
+                Apply Settings
+              </Text>
+            </TouchableOpacity>
+
+            {/* Cancel */}
+            <TouchableOpacity
+              style={styles.cancelButton}
+              onPress={() => setShowSettings(false)}
+            >
+              <Text style={styles.cancelText}>
+                Cancel
+              </Text>
+            </TouchableOpacity>
+
+          </View>
+
+        ) : (
+
+          /* QUIZ */
+          <>
+            <Text style={styles.progress}>
+              Question {current + 1} of {quizData.quiz.length}
+            </Text>
+
+            {timerEnabled && (
+              <Text style={[
+                styles.timer,
+                secondsLeft <= 5 && styles.timerWarning
+              ]}>
+                ⏱ Time Left: {secondsLeft}s
+              </Text>
+            )}
+
+            <View style={styles.card}>
+
+              <Text style={styles.question}>
+                {question.question}
+              </Text>
+
+              {/*Display attached image */}
+              {question.imageUrl && (
+                <Image
+                  source={{ uri: question.imageUrl }}
+                  style={styles.questionImage}
+                />
+              )}
+
+              {question.options.map((option, index) => {
+
+                const isCorrect =
+                  answered &&
+                  index === question.correctAnswer;
+
+                const isWrong =
+                  answered &&
+                  selected === index &&
+                  index !== question.correctAnswer;
+
+                return (
+                  <TouchableOpacity
+                    key={index}
+                    style={[
+                      styles.option,
+
+                      selected === index && !answered &&
+                        styles.selected,
+
+                      isCorrect && styles.correct,
+
+                      isWrong && styles.wrong
+                    ]}
+                    disabled={answered}
+                    onPress={() => setSelected(index)}
+                  >
+                    <Text style={styles.optionText}>
+                      {String.fromCharCode(65 + index)}. {option}
+                    </Text>
+                  </TouchableOpacity>
+                );
+              })}
+
+              {/* Answer Feedback */}
+              {answered && (
+                <Text style={styles.feedback}>
+                  {timedOut
+                    ? `Time's up! Correct answer: ${question.options[question.correctAnswer]}`
+                    : selected === question.correctAnswer
+                      ? 'Correct Answer!'
+                      : `Incorrect! Correct answer: ${question.options[question.correctAnswer]}`
+                  }
                 </Text>
 
                 {/* Header */}

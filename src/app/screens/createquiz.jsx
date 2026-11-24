@@ -1,14 +1,17 @@
 
+import * as ImagePicker from 'expo-image-picker';
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import {
   Alert,
+  Image,
   KeyboardAvoidingView,
   Platform,
   Pressable,
   ScrollView,
   StyleSheet,
   Text,
+  TouchableOpacity,
   View
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -25,11 +28,23 @@ export default function CreateQuiz() {
     const [title, setTitle] = useState('');
     const [desc, setDesc] = useState('');
 
-    const [quiz, setQuiz] = useState([
-        {
-            question: '',
-            answer: ''
-        }
+  const [quiz, setQuiz] = useState([
+    {
+      question: '',
+      answer: '',
+      imageUrl: null
+    }
+  ]);
+
+  // Add another question
+  const addQuiz = () => {
+    setQuiz([
+      ...quiz,
+      {
+        question: '',
+        answer: '',
+        imageUrl: null
+      }
     ]);
 
     // Add another question
@@ -59,10 +74,31 @@ export default function CreateQuiz() {
     const updateAnswer = (index, text) => {
         const updatedQuiz = [...quiz];
 
-        updatedQuiz[index] = {
-            ...updatedQuiz[index],
-            answer: text
-        };
+  const pickImage = async (index) => {
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ['images'],
+      allowsEditing: true,
+      quality: 0.7
+    });
+
+    if (!result.canceled) {
+      const updateQuiz = [...quiz];
+
+      updateQuiz[index] = {
+        ...updateQuiz[index],
+        imageUrl: result.assets[0].uri
+      };
+
+      setQuiz(updateQuiz);
+    }
+  };
+
+  // Save quiz
+  const handleSave = async () => {
+    if (!title.trim()) {
+      Alert.alert('Missing Title', 'Please enter a quiz title.');
+      return;
+    }
 
         setQuiz(updatedQuiz);
     };
@@ -98,141 +134,154 @@ export default function CreateQuiz() {
             item.answer.trim().toLowerCase()
         );
 
-        if (new Set(answers).size !== answers.length) {
-            Alert.alert(
-                'Duplicate Answers',
-                'Every question must have a different correct answer.'
-            );
-            return;
-        }
+    try {
+      const result = await saveQuiz({
+        title: title.trim(),
+        desc: desc.trim(),
+        quiz: quiz.map(item => ({
+          question: item.question.trim(),
+          answer: item.answer.trim(),
+          imageUrl: item.imageUrl
+        }))
+      });
 
-        try {
-            const result = await saveQuiz({
-                title: title.trim(),
-                desc: desc.trim(),
-                quiz: quiz.map(item => ({
-                    question: item.question.trim(),
-                    answer: item.answer.trim()
-                }))
-            });
-
-            if (result === true) {
-                Alert.alert(
-                    'Success',
-                    'Your quiz has been saved!',
-                    [
-                        {
-                            text: 'OK',
-                            onPress: () => router.replace('/quizzes')
-                        }
-                    ]
-                );
-            } else {
-                Alert.alert('Error', 'Unable to save your quiz.');
+      if (result === true) {
+        Alert.alert(
+          'Success',
+          'Your quiz has been saved!',
+          [
+            {
+              text: 'OK',
+              onPress: () =>
+                router.replace('/quizzes')
             }
-        } catch (error) {
-            console.log('Save error:', error);
-            Alert.alert('Error', 'Something went wrong while saving.');
-        }
-    };
+          ]
+        );
+      } else {
+        Alert.alert('Error', 'Unable to save your quiz.');
+      }
+    } catch (error) {
+      console.log('Save error:', error);
+      Alert.alert('Error', 'Something went wrong while saving.');
+    }
+  };
 
-    return (
-        <SafeAreaView style={styles.safe}>
-            <KeyboardAvoidingView
-                style={{ flex: 1 }}
-                behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+  return (
+  <SafeAreaView style={styles.safe}>
+    <KeyboardAvoidingView
+      style={{ flex: 1 }}
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+    >
+      <ScrollView
+        style={styles.container}
+        contentContainerStyle={styles.content}
+        keyboardShouldPersistTaps="handled"
+      >
+
+        <View style={styles.header}>
+          <AddSign
+            icon="arrow-back-outline"
+            size={30}
+            color="black"
+            onPress={() => router.push('/(tabs)/create')}
+          />
+
+          <Text style={styles.headerTxt}>
+            Create Quiz
+          </Text>
+        </View>
+
+        <Text style={styles.subTxt}>Add Title</Text>
+
+        <UserInput
+          type="Title"
+          value={title}
+          onChangeText={setTitle}
+        />
+
+        <Text style={styles.subTxt}>Add Description</Text>
+
+        <UserInput
+          type="Description"
+          value={desc}
+          onChangeText={setDesc}
+        />
+
+        <Text style={styles.instruction}>
+          Add at least 4 questions with different correct answers.
+          The app will automatically generate 4 multiple-choice
+          options for each question.
+        </Text>
+
+        <AddSign
+          style={styles.addSign}
+          icon="add-circle"
+          size={30}
+          color="darkblue"
+          onPress={addQuiz}
+        />
+
+        {quiz.map((item, index) => (
+          <View style={styles.cards} key={index}>
+
+            <Text style={styles.questionTitle}>
+              Question {index + 1}
+            </Text>
+
+            <Text style={styles.subTxt}>
+              Add Question
+            </Text>
+
+            <Add
+              add="Question"
+              value={item.question}
+              onChangeText={(text) =>
+                updateQuestion(index, text)
+              }
+            />
+
+            {/* Attach image here*/}
+            <TouchableOpacity
+              style={styles.imageButton}
+              onPress={() => pickImage(index)}
             >
-                <ScrollView
-                    style={styles.container}
-                    contentContainerStyle={styles.content}
-                    keyboardShouldPersistTaps="handled"
-                    keyboardDismissMode="on-drag"
-                >
-                    <Text style={styles.logo}>QuizPen</Text>
+              <Text style={styles.imageButtonText}>
+                + Attach Image
+              </Text>
 
-                    <View style={styles.header}>
-                        <BackButton />
+            </TouchableOpacity>
 
-                        <Text style={styles.headerTxt}>
-                            Create Quiz
-                        </Text>
-                    </View>
+            {item.imageUrl && (
+              <Image
+                source={{ uri: item.imageUrl }}
+                style={styles.questionImage}
+              />
+            )}
 
-                    <Text style={styles.subTxt}>Add Title</Text>
+            <Text style={styles.subTxt}>
+              Add Correct Answer
+            </Text>
 
-                    <UserInput
-                        type="Title"
-                        value={title}
-                        onChangeText={setTitle}
-                    />
+            <Add
+              add="Correct Answer"
+              value={item.answer}
+              onChangeText={(text) =>
+                updateAnswer(index, text)
+              }
+            />
 
-                    <Text style={styles.subTxt}>Add Description</Text>
+          </View>
+        ))}
 
-                    <UserInput
-                        type="Description"
-                        value={desc}
-                        onChangeText={setDesc}
-                    />
+        <ActButton 
+         name="Save Quiz Set"
+         onPress={handleSave}
+        />
 
-                    <Text style={styles.instruction}>
-                        Add at least 4 questions with different correct answers.
-                        The app will automatically generate 4 multiple-choice
-                        options for each question.
-                    </Text>
-
-                    <AddSign
-                        style={styles.addSign}
-                        icon="add-circle"
-                        size={30}
-                        color="#FFBA00"
-                        onPress={addQuiz}
-                    />
-
-                    {quiz.map((item, index) => (
-                        <View style={styles.cards} key={index}>
-                            <Text style={styles.questionTitle}>
-                                Question {index + 1}
-                            </Text>
-
-                            <Text style={styles.subTxt}>
-                                Add Question
-                            </Text>
-
-                            <Add
-                                add="Question"
-                                value={item.question}
-                                onChangeText={(text) =>
-                                    updateQuestion(index, text)
-                                }
-                            />
-
-                            <Text style={styles.subTxt}>
-                                Add Correct Answer
-                            </Text>
-
-                            <Add
-                                add="Correct Answer"
-                                value={item.answer}
-                                onChangeText={(text) =>
-                                    updateAnswer(index, text)
-                                }
-                            />
-                        </View>
-                    ))}
-
-                    <Pressable
-                        style={styles.saveButton}
-                        onPress={handleSave}
-                    >
-                        <Text style={styles.saveButtonText}>
-                            Save Quiz Set
-                        </Text>
-                    </Pressable>
-
-                </ScrollView>
-            </KeyboardAvoidingView>
-        </SafeAreaView>
-    );
+      </ScrollView>
+    </KeyboardAvoidingView>
+    </SafeAreaView>
+  );
 }
 
 const styles = StyleSheet.create({
@@ -316,5 +365,26 @@ const styles = StyleSheet.create({
         color: '#125643',
         fontSize: 16,
         fontWeight: 'bold'
-    }
+    },
+
+  imageButton: {
+  backgroundColor: '#6354B8',
+  padding: 12,
+  borderRadius: 8,
+  alignItems: 'center',
+  marginTop: 12
+},
+
+imageButtonText: {
+  color: '#fff',
+  fontWeight: 'bold'
+},
+
+questionImage: {
+  width: '100%',
+  height: 180,
+  resizeMode: 'contain',
+  marginTop: 10,
+  borderRadius: 10
+}
 });
