@@ -2,8 +2,8 @@
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import {
-  Text,
-  TouchableOpacity
+    Text,
+    TouchableOpacity
 } from 'react-native';
 
 import ActButton from '../components/ui/ActButton';
@@ -11,8 +11,8 @@ import AuthForm from '../components/ui/AuthForm';
 import UserInput from '../components/ui/UserInput';
 
 import {
-  getAccountByEmail,
-  setCurrentUser
+    getAccountByEmail,
+    setCurrentUser
 } from '../storage/account';
 
 export default function HomeScreen() {
@@ -23,6 +23,7 @@ export default function HomeScreen() {
 
     const [errors, setErrors] = useState({});
     const [touched, setTouched] = useState({});
+
 
     const validateEmail = (value) => {
         if (!value.trim()) {
@@ -36,6 +37,7 @@ export default function HomeScreen() {
         return '';
     };
 
+
     const validatePassword = (value) => {
         if (!value) {
             return 'Password is required.';
@@ -44,22 +46,16 @@ export default function HomeScreen() {
         return '';
     };
 
+
     const handleEmailChange = (value) => {
         setEmail(value);
 
-        if (touched.email) {
-            setErrors(prev => ({
-                ...prev,
-                email: validateEmail(value)
-            }));
-        }
-
-        // Clear old account errors when email changes
         setErrors(prev => ({
             ...prev,
             email: validateEmail(value)
         }));
     };
+
 
     const handlePasswordChange = (value) => {
         setPassword(value);
@@ -71,6 +67,7 @@ export default function HomeScreen() {
             }));
         }
     };
+
 
     const checkAccount = async () => {
         const emailError = validateEmail(email);
@@ -102,6 +99,7 @@ export default function HomeScreen() {
         return account;
     };
 
+
     const checkPassword = async () => {
         if (!password) {
             setErrors(prev => ({
@@ -127,6 +125,7 @@ export default function HomeScreen() {
             }));
         }
     };
+
 
     const handleLogin = async () => {
         setTouched({
@@ -178,6 +177,7 @@ export default function HomeScreen() {
         }
     };
 
+
     return (
         <AuthForm
             title="QuizPen"
@@ -190,7 +190,11 @@ export default function HomeScreen() {
                 onChangeText={handleEmailChange}
                 error={touched.email ? errors.email : ''}
                 onBlur={() => {
-                    setTouched(prev => ({ ...prev, email: true }));
+                    setTouched(prev => ({
+                        ...prev,
+                        email: true
+                    }));
+
                     checkAccount();
                 }}
             />
@@ -202,12 +206,18 @@ export default function HomeScreen() {
                 isPassword={true}
                 error={touched.password ? errors.password : ''}
                 onBlur={() => {
-                    setTouched(prev => ({ ...prev, password: true }));
+                    setTouched(prev => ({
+                        ...prev,
+                        password: true
+                    }));
+
                     checkPassword();
                 }}
             />
 
-            <TouchableOpacity>
+            <TouchableOpacity
+                onPress={() => router.push('/forgotpassword')}
+            >
                 <Text>Forgot Password?</Text>
             </TouchableOpacity>
 
