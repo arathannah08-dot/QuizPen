@@ -15,7 +15,6 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import Add from '../../components/ui/Add';
 import AddSign from '../../components/ui/AddSign';
-import BackButton from '../../components/ui/BackButton';
 import UserInput from '../../components/ui/UserInput';
 import { getQuiz, updateQuiz } from '../../storage/quiz';
 
